@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "wouter";
 import { useGetBooking, useGetBookingTracking } from "@workspace/api-client-react";
+import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { Loader2, MapPin, Clock, CheckCircle, Zap, Star, ArrowLeft } from "lucide-react";
-
-const TIMELINE_STEPS = [
-  { key: "pending",     label: "Booking Received",    desc: "Your request has been submitted" },
-  { key: "accepted",    label: "Technician Assigned",  desc: "A tech has accepted your job" },
-  { key: "in_progress", label: "Tech En Route",        desc: "Your technician is on the way" },
-  { key: "completed",   label: "Job Complete",          desc: "Issue resolved successfully" },
-];
+import { Loader2, MapPin, CheckCircle, Zap, Star, ArrowLeft } from "lucide-react";
 
 const STATUS_ORDER: Record<string, number> = {
   pending: 0, accepted: 1, in_progress: 2, completed: 3, cancelled: -1,
@@ -17,6 +11,7 @@ const STATUS_ORDER: Record<string, number> = {
 
 export default function Tracking() {
   const { id } = useParams<{ id: string }>();
+  const { t } = useLanguage();
   const bookingId = parseInt(id ?? "0");
   const [simEta, setSimEta] = useState(Math.floor(Math.random() * 20) + 5);
   const [simProgress, setSimProgress] = useState(10);
@@ -24,7 +19,6 @@ export default function Tracking() {
   const { data: booking, isLoading } = useGetBooking(bookingId, {
     query: { enabled: !!bookingId, refetchInterval: 15_000 } as any
   });
-
   const { data: tracking } = useGetBookingTracking(bookingId, {
     query: { enabled: !!bookingId, refetchInterval: 10_000 } as any
   });
@@ -37,27 +31,26 @@ export default function Tracking() {
     return () => clearInterval(interval);
   }, []);
 
-  const displayEta   = tracking?.etaMinutes  ?? simEta;
-  const displayProg  = tracking?.progress    ?? simProgress;
-  const displayLat   = tracking?.technicianLat;
-  const displayLng   = tracking?.technicianLng;
+  const displayEta  = tracking?.etaMinutes ?? simEta;
+  const displayProg = tracking?.progress   ?? simProgress;
+  const displayLat  = tracking?.technicianLat;
+  const displayLng  = tracking?.technicianLng;
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const TIMELINE_STEPS = [
+    { key: "pending",     label: t("track_s1"), desc: t("track_s1d") },
+    { key: "accepted",    label: t("track_s2"), desc: t("track_s2d") },
+    { key: "in_progress", label: t("track_s3"), desc: t("track_s3d") },
+    { key: "completed",   label: t("track_s4"), desc: t("track_s4d") },
+  ];
 
-  if (!booking) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="font-mono text-muted-foreground">Booking not found.</p>
-        <Button asChild variant="outline"><Link href="/dashboard">← Dashboard</Link></Button>
-      </div>
-    );
-  }
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+
+  if (!booking) return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <p className="font-mono text-muted-foreground">{t("track_not_found")}</p>
+      <Button asChild variant="outline"><Link href="/dashboard">← {t("track_dashboard")}</Link></Button>
+    </div>
+  );
 
   const currentStepIdx = STATUS_ORDER[booking.status ?? "pending"] ?? 0;
 
@@ -66,10 +59,10 @@ export default function Tracking() {
       <div className="container mx-auto px-4 max-w-2xl">
         <div className="mb-6">
           <Button asChild variant="ghost" size="sm" className="font-mono text-xs mb-4">
-            <Link href="/dashboard"><ArrowLeft className="w-3 h-3 mr-1" /> Dashboard</Link>
+            <Link href="/dashboard"><ArrowLeft className="w-3 h-3 mr-1" /> {t("track_dashboard")}</Link>
           </Button>
-          <p className="text-primary font-mono text-sm uppercase tracking-widest">Live Tracking</p>
-          <h1 className="text-2xl font-bold uppercase mt-1">Job #{bookingId}</h1>
+          <p className="text-primary font-mono text-sm uppercase tracking-widest">{t("track_label")}</p>
+          <h1 className="text-2xl font-bold uppercase mt-1">{t("track_label").split(" ")[0]} #{bookingId}</h1>
         </div>
 
         {booking.status !== "completed" && booking.status !== "cancelled" && (
@@ -78,25 +71,20 @@ export default function Tracking() {
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 <span className="text-primary font-mono text-sm font-bold uppercase">
-                  {booking.status === "in_progress" ? "Tech En Route" : "Processing"}
+                  {booking.status === "in_progress" ? t("track_en_route") : t("track_processing")}
                 </span>
               </div>
               {booking.status === "in_progress" && (
                 <div className="text-right">
                   <p className="text-2xl font-bold font-mono text-primary">{displayEta} min</p>
-                  <p className="text-xs text-muted-foreground font-mono">ETA</p>
+                  <p className="text-xs text-muted-foreground font-mono">{t("track_eta")}</p>
                 </div>
               )}
             </div>
-
             <div className="w-full bg-border rounded-full h-2 mb-2">
-              <div
-                className="bg-primary h-2 rounded-full transition-all duration-1000"
-                style={{ width: `${displayProg}%` }}
-              />
+              <div className="bg-primary h-2 rounded-full transition-all duration-1000" style={{ width: `${displayProg}%` }} />
             </div>
             <p className="text-xs font-mono text-muted-foreground text-right">{displayProg}%</p>
-
             {displayLat != null && displayLng != null && (
               <div className="mt-4 flex items-center gap-2 text-xs font-mono text-muted-foreground border border-border/50 px-3 py-2 rounded bg-background/30">
                 <MapPin className="w-3 h-3 text-primary" />
@@ -110,14 +98,14 @@ export default function Tracking() {
           <div className="border border-emerald-400/40 bg-emerald-400/5 p-6 rounded-lg mb-6 flex items-center gap-4">
             <CheckCircle className="w-10 h-10 text-emerald-400 flex-shrink-0" />
             <div>
-              <p className="font-bold uppercase text-emerald-400 font-mono">Job Completed</p>
-              <p className="text-sm text-muted-foreground font-mono mt-1">Your issue has been resolved.</p>
+              <p className="font-bold uppercase text-emerald-400 font-mono">{t("track_completed")}</p>
+              <p className="text-sm text-muted-foreground font-mono mt-1">{t("track_resolved")}</p>
             </div>
           </div>
         )}
 
         <div className="border border-border bg-card rounded-lg p-6 mb-6">
-          <h2 className="font-bold uppercase font-mono text-sm mb-4 text-primary">Job Timeline</h2>
+          <h2 className="font-bold uppercase font-mono text-sm mb-4 text-primary">{t("track_timeline")}</h2>
           <div className="space-y-0">
             {TIMELINE_STEPS.map((step, i) => {
               const done = i <= currentStepIdx;
@@ -142,18 +130,16 @@ export default function Tracking() {
 
         {booking.technicianName && (
           <div className="border border-border bg-card rounded-lg p-6 mb-6">
-            <h2 className="font-bold uppercase font-mono text-sm mb-4 text-primary">Your Technician</h2>
+            <h2 className="font-bold uppercase font-mono text-sm mb-4 text-primary">{t("track_your_tech")}</h2>
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary font-mono">
-                  {booking.technicianName.charAt(0)}
-                </span>
+                <span className="text-2xl font-bold text-primary font-mono">{booking.technicianName.charAt(0)}</span>
               </div>
               <div className="flex-1">
                 <p className="font-bold uppercase">{booking.technicianName}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <Star className="w-3 h-3 fill-primary text-primary" />
-                  <span className="text-xs font-mono text-primary">Expert Technician</span>
+                  <span className="text-xs font-mono text-primary">{t("track_expert")}</span>
                 </div>
               </div>
             </div>
@@ -161,14 +147,14 @@ export default function Tracking() {
         )}
 
         <div className="border border-border bg-card rounded-lg p-6">
-          <h2 className="font-bold uppercase font-mono text-sm mb-4 text-primary">Job Details</h2>
+          <h2 className="font-bold uppercase font-mono text-sm mb-4 text-primary">{t("track_details")}</h2>
           <div className="space-y-3">
             {[
-              { label: "Service",   value: booking.categoryName },
-              { label: "Address",   value: booking.address },
-              { label: "Scheduled", value: booking.scheduledAt ? new Date(booking.scheduledAt).toLocaleString() : "ASAP" },
-              { label: "Est. Cost", value: booking.estimatedCost ? `$${booking.estimatedCost}` : "TBD" },
-              { label: "Final Cost", value: booking.finalCost ? `$${booking.finalCost}` : undefined },
+              { label: t("track_service"),    value: booking.categoryName },
+              { label: t("track_address"),    value: booking.address },
+              { label: t("track_scheduled"),  value: booking.scheduledAt ? new Date(booking.scheduledAt).toLocaleString() : "ASAP" },
+              { label: t("track_est_cost"),   value: booking.estimatedCost ? `$${booking.estimatedCost}` : "TBD" },
+              { label: t("track_final_cost"), value: booking.finalCost ? `$${booking.finalCost}` : undefined },
             ].map((r) => r.value ? (
               <div key={r.label} className="flex justify-between py-1 border-b border-border/40">
                 <span className="text-xs font-mono text-muted-foreground uppercase">{r.label}</span>

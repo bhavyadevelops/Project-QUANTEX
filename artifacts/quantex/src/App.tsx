@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/lib/auth";
+import { LanguageProvider } from "@/lib/i18n";
 import { Layout } from "@/components/layout";
 import { ProtectedRoute } from "@/components/protected-route";
 import NotFound from "@/pages/not-found";
@@ -28,10 +29,7 @@ import TechnicianBookings from "@/pages/technician/bookings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      staleTime: 30_000,
-      retry: 1,
-    },
+    queries: { staleTime: 30_000, retry: 1 },
   },
 });
 
@@ -46,45 +44,28 @@ function Router() {
       <Route path="/about" component={About} />
 
       <Route path="/dashboard">
-        <ProtectedRoute allowedRoles={["customer"]}>
-          <CustomerDashboard />
-        </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["customer"]}><CustomerDashboard /></ProtectedRoute>
       </Route>
       <Route path="/book">
-        <ProtectedRoute allowedRoles={["customer"]}>
-          <BookTechnician />
-        </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["customer"]}><BookTechnician /></ProtectedRoute>
       </Route>
       <Route path="/ai-assistant">
-        <ProtectedRoute allowedRoles={["customer"]}>
-          <AIAssistant />
-        </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["customer"]}><AIAssistant /></ProtectedRoute>
       </Route>
       <Route path="/tracking/:id">
-        <ProtectedRoute allowedRoles={["customer"]}>
-          <Tracking />
-        </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["customer"]}><Tracking /></ProtectedRoute>
       </Route>
       <Route path="/history">
-        <ProtectedRoute allowedRoles={["customer"]}>
-          <History />
-        </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["customer"]}><History /></ProtectedRoute>
       </Route>
       <Route path="/settings">
-        <ProtectedRoute allowedRoles={["customer", "technician"]}>
-          <Settings />
-        </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["customer", "technician"]}><Settings /></ProtectedRoute>
       </Route>
-
       <Route path="/technician/dashboard">
-        <ProtectedRoute allowedRoles={["technician"]}>
-          <TechnicianDashboard />
-        </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["technician"]}><TechnicianDashboard /></ProtectedRoute>
       </Route>
       <Route path="/technician/bookings">
-        <ProtectedRoute allowedRoles={["technician"]}>
-          <TechnicianBookings />
-        </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["technician"]}><TechnicianBookings /></ProtectedRoute>
       </Route>
 
       <Route component={NotFound} />
@@ -96,16 +77,18 @@ function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <Layout>
-                <Router />
-              </Layout>
-            </WouterRouter>
-            <Toaster />
-          </TooltipProvider>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <Layout>
+                  <Router />
+                </Layout>
+              </WouterRouter>
+              <Toaster />
+            </TooltipProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
