@@ -1,13 +1,21 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
-import { useListBookings, ListBookingsStatus } from "@workspace/api-client-react";
+import { useListBookings, useUpdateBookingStatus, ListBookingsStatus, BookingStatusUpdateStatus } from "@workspace/api-client-react";
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, Clock, Zap, XCircle, AlertCircle, MapPin, Star, Plus } from "lucide-react";
+
+const CANCELLABLE = new Set(["pending", "accepted"]);
 
 export default function History() {
   const { t } = useLanguage();
   const [filter, setFilter] = useState<string>("");
+  const { toast } = useToast();
 
   const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     pending:     { label: t("st_pending"),     color: "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",    icon: <Clock className="w-3 h-3" /> },
@@ -26,9 +34,20 @@ export default function History() {
     { label: t("hist_cancelled"), value: ListBookingsStatus.cancelled },
   ] as const;
 
-  const { data: bookings, isLoading } = useListBookings(
+  const { data: bookings, isLoading, refetch } = useListBookings(
     filter ? { status: filter as typeof ListBookingsStatus[keyof typeof ListBookingsStatus] } : undefined
   );
+  const updateStatus = useUpdateBookingStatus();
+
+  const handleCancel = async (id: number) => {
+    try {
+      await updateStatus.mutateAsync({ id, data: { status: BookingStatusUpdateStatus.cancelled } });
+      toast({ title: t("cancel_success"), description: t("cancel_success_desc") });
+      refetch();
+    } catch (err: any) {
+      toast({ title: "Cancellation Failed", description: err.message ?? "Please try again.", variant: "destructive" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background py-10">
@@ -63,6 +82,7 @@ export default function History() {
           <div className="space-y-4">
             {bookings.map((booking) => {
               const cfg = STATUS_CONFIG[booking.status ?? "pending"] ?? STATUS_CONFIG.pending;
+              const canCancel = CANCELLABLE.has(booking.status ?? "");
               return (
                 <div key={booking.id} className="border border-border bg-card p-5 rounded-lg hover:border-primary/40 transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
@@ -82,17 +102,50 @@ export default function History() {
                       <p className="text-xs text-muted-foreground font-mono">{booking.scheduledAt ? new Date(booking.scheduledAt).toLocaleDateString() : ""}</p>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-muted-foreground">
+
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-muted-foreground mb-4">
                     {booking.technicianName && <span className="flex items-center gap-1"><Star className="w-3 h-3 text-primary" /> {booking.technicianName}</span>}
                     {booking.address && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {booking.address}</span>}
                   </div>
-                  {(booking.status === "in_progress" || booking.status === "accepted") && (
-                    <div className="mt-4">
+
+                  <div className="flex flex-wrap gap-2">
+                    {(booking.status === "in_progress" || booking.status === "accepted") && (
                       <Button asChild size="sm" variant="outline" className="text-xs font-mono uppercase">
                         <Link href={`/tracking/${booking.id}`}><MapPin className="w-3 h-3 mr-1" /> {t("hist_track")}</Link>
                       </Button>
-                    </div>
-                  )}
+                    )}
+
+                    {canCancel && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-xs font-mono uppercase text-red-400 border-red-400/30 hover:bg-red-400/10 hover:border-red-400/60"
+                            disabled={updateStatus.isPending}
+                          >
+                            <XCircle className="w-3 h-3 mr-1" />
+                            {t("cancel_btn")}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="font-mono uppercase">{t("cancel_title")}</AlertDialogTitle>
+                            <AlertDialogDescription className="font-mono text-sm">{t("cancel_desc")}</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="font-mono uppercase text-xs">{t("cancel_abort")}</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleCancel(booking.id)}
+                              className="font-mono uppercase text-xs bg-red-500 hover:bg-red-600 text-white"
+                            >
+                              {t("cancel_confirm")}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
                 </div>
               );
             })}

@@ -148,6 +148,13 @@ const en: T = {
   st_pending: "PENDING", st_accepted: "ACCEPTED", st_in_progress: "IN PROGRESS",
   st_completed: "COMPLETED", st_cancelled: "CANCELLED",
   // Mic
+  cancel_btn: "Cancel Booking",
+  cancel_title: "Cancel This Booking?",
+  cancel_desc: "The technician will be notified and the slot released. This action cannot be undone.",
+  cancel_confirm: "Yes, Cancel",
+  cancel_abort: "Keep Booking",
+  cancel_success: "Booking Cancelled",
+  cancel_success_desc: "Your booking has been successfully cancelled.",
   mic_listening: "Listening...", mic_unsupported: "Voice input not supported",
 };
 
@@ -260,6 +267,13 @@ const gu: T = {
   tech_b_empty: "Aa filter maate koi nokri mili nathi.",
   st_pending: "RAKHEVU", st_accepted: "SVIKAARAYU", st_in_progress: "CHALTU CHHE",
   st_completed: "PURN", st_cancelled: "RADD",
+  cancel_btn: "Booking Radd Karo",
+  cancel_title: "Aa Booking Radd Karavi?",
+  cancel_desc: "Technician ne jaankaari aapvamashe ane slot mukt thashe. Aa kriya undone thai shak nathi.",
+  cancel_confirm: "Ha, Radd Karo",
+  cancel_abort: "Booking Rakhao",
+  cancel_success: "Booking Radd Thayi",
+  cancel_success_desc: "Tamari booking safaltapurvak radd thayi chhe.",
   mic_listening: "Saaambhalu chhu...", mic_unsupported: "Tamara browser maa voice input samarthan nathi",
 };
 
@@ -372,6 +386,13 @@ const hi: T = {
   tech_b_empty: "इस फ़िल्टर के लिए कोई नौकरी नहीं मिली।",
   st_pending: "लंबित", st_accepted: "स्वीकृत", st_in_progress: "प्रगति में",
   st_completed: "पूर्ण", st_cancelled: "रद्द",
+  cancel_btn: "बुकिंग रद्द करें",
+  cancel_title: "यह बुकिंग रद्द करें?",
+  cancel_desc: "तकनीशियन को सूचित किया जाएगा और स्लॉट जारी किया जाएगा। यह क्रिया पूर्ववत नहीं की जा सकती।",
+  cancel_confirm: "हाँ, रद्द करें",
+  cancel_abort: "बुकिंग रखें",
+  cancel_success: "बुकिंग रद्द हुई",
+  cancel_success_desc: "आपकी बुकिंग सफलतापूर्वक रद्द कर दी गई है।",
   mic_listening: "सुन रहा हूँ...", mic_unsupported: "इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है",
 };
 
@@ -484,6 +505,13 @@ const fr: T = {
   tech_b_empty: "Aucune mission trouvée pour ce filtre.",
   st_pending: "EN ATTENTE", st_accepted: "ACCEPTÉE", st_in_progress: "EN COURS",
   st_completed: "TERMINÉE", st_cancelled: "ANNULÉE",
+  cancel_btn: "Annuler la Réservation",
+  cancel_title: "Annuler cette Réservation ?",
+  cancel_desc: "Le technicien sera notifié et le créneau libéré. Cette action est irréversible.",
+  cancel_confirm: "Oui, Annuler",
+  cancel_abort: "Garder la Réservation",
+  cancel_success: "Réservation Annulée",
+  cancel_success_desc: "Votre réservation a été annulée avec succès.",
   mic_listening: "Écoute en cours...", mic_unsupported: "Saisie vocale non prise en charge",
 };
 
@@ -596,6 +624,13 @@ const de: T = {
   tech_b_empty: "Keine Jobs für diesen Filter gefunden.",
   st_pending: "AUSSTEHEND", st_accepted: "ANGENOMMEN", st_in_progress: "IN BEARBEITUNG",
   st_completed: "ABGESCHLOSSEN", st_cancelled: "STORNIERT",
+  cancel_btn: "Buchung stornieren",
+  cancel_title: "Diese Buchung stornieren?",
+  cancel_desc: "Der Techniker wird benachrichtigt und der Slot freigegeben. Diese Aktion kann nicht rückgängig gemacht werden.",
+  cancel_confirm: "Ja, stornieren",
+  cancel_abort: "Buchung behalten",
+  cancel_success: "Buchung storniert",
+  cancel_success_desc: "Ihre Buchung wurde erfolgreich storniert.",
   mic_listening: "Höre zu...", mic_unsupported: "Spracheingabe nicht unterstützt",
 };
 
@@ -708,6 +743,13 @@ const zh: T = {
   tech_b_empty: "此筛选条件下未找到工作。",
   st_pending: "待处理", st_accepted: "已接受", st_in_progress: "进行中",
   st_completed: "已完成", st_cancelled: "已取消",
+  cancel_btn: "取消预约",
+  cancel_title: "取消此预约？",
+  cancel_desc: "技术人员将收到通知，时间段将被释放。此操作无法撤销。",
+  cancel_confirm: "是，取消",
+  cancel_abort: "保留预约",
+  cancel_success: "预约已取消",
+  cancel_success_desc: "您的预约已成功取消。",
   mic_listening: "正在聆听...", mic_unsupported: "此浏览器不支持语音输入",
 };
 
