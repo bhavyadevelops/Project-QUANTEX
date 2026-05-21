@@ -48,7 +48,7 @@ AI-powered technician booking platform — customers book on-demand tech repair,
 ## Demo Accounts
 
 - Customers: `alex@example.com`, `jordan@example.com`, `sam@example.com` — password: `demo123`
-- Technicians: `marcus@example.com`, `priya@example.com`, `derek@example.com`, `nina@example.com` — password: `tech123`
+- Technicians: `kanan@example.com`, `priyal@example.com`, `nirav@example.com`, `suraj@example.com` — password: `tech123`
 - New accounts can also be created via the Register page
 
 ## User preferences
