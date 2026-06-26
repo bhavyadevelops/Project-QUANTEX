@@ -483,16 +483,67 @@ export const analyzeIssueBodyDescriptionMin = 10;
 
 
 export const AnalyzeIssueBody = zod.object({
-  "description": zod.string().min(analyzeIssueBodyDescriptionMin)
+  "description": zod.string().min(analyzeIssueBodyDescriptionMin),
+  "imageBase64": zod.string().nullish()
 })
 
 export const AnalyzeIssueResponse = zod.object({
   "category": zod.string(),
-  "urgency": zod.enum(['low', 'medium', 'high']),
+  "urgency": zod.enum(['low', 'medium', 'high', 'critical']),
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']).optional(),
+  "confidence": zod.number().nullish(),
   "troubleshootingSteps": zod.array(zod.string()),
   "technicianType": zod.string(),
   "summary": zod.string(),
-  "suggestedCategoryId": zod.number().nullish()
+  "suggestedCategoryId": zod.number().nullish(),
+  "estimatedCostMin": zod.number().nullish(),
+  "estimatedCostMax": zod.number().nullish(),
+  "estimatedDuration": zod.string().nullish(),
+  "safetyPrecautions": zod.array(zod.string()).optional(),
+  "requiresTechnician": zod.boolean(),
+  "isEmergency": zod.boolean(),
+  "emergencyType": zod.string().nullish()
+})
+
+
+/**
+ * @summary AI-generated brief for a technician before a job
+ */
+export const GetTechnicianBriefBody = zod.object({
+  "issueDescription": zod.string(),
+  "categoryName": zod.string(),
+  "customerName": zod.string().nullish(),
+  "address": zod.string().nullish()
+})
+
+export const GetTechnicianBriefResponse = zod.object({
+  "issueSummary": zod.string(),
+  "suggestedParts": zod.array(zod.string()),
+  "safetyRecommendations": zod.array(zod.string()),
+  "estimatedDuration": zod.string(),
+  "toolsNeeded": zod.array(zod.string()),
+  "difficultyLevel": zod.string().nullish(),
+  "customerTips": zod.string().nullish()
+})
+
+
+/**
+ * @summary Platform-wide analytics summary
+ */
+export const GetAnalyticsSummaryResponse = zod.object({
+  "totalRequests": zod.number(),
+  "completedJobs": zod.number(),
+  "pendingJobs": zod.number(),
+  "cancelledJobs": zod.number(),
+  "activeJobs": zod.number().optional(),
+  "averageRepairCost": zod.number(),
+  "technicianCount": zod.number(),
+  "customerCount": zod.number(),
+  "averageTechnicianRating": zod.number().optional(),
+  "topCategories": zod.array(zod.object({
+  "name": zod.string(),
+  "count": zod.number()
+}))
 })
 
 

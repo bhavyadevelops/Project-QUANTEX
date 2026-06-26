@@ -39,11 +39,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("nav_dashboard")}</Link>
             <Link href="/book" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("nav_book")}</Link>
             <Link href="/ai-assistant" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("nav_ai")}</Link>
+            <Link href="/analytics" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("nav_analytics")}</Link>
           </>
         ) : (
           <>
             <Link href="/technician/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("nav_dashboard")}</Link>
             <Link href="/technician/bookings" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("nav_jobs")}</Link>
+            <Link href="/analytics" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("nav_analytics")}</Link>
           </>
         )
       )}

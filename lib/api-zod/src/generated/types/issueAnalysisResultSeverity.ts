@@ -6,10 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type IssueAnalysisResultUrgency = typeof IssueAnalysisResultUrgency[keyof typeof IssueAnalysisResultUrgency];
+export type IssueAnalysisResultSeverity = typeof IssueAnalysisResultSeverity[keyof typeof IssueAnalysisResultSeverity];
 
 
-export const IssueAnalysisResultUrgency = {
+export const IssueAnalysisResultSeverity = {
   low: 'low',
   medium: 'medium',
   high: 'high',

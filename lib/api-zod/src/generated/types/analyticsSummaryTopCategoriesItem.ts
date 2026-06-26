@@ -6,9 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface IssueAnalysisInput {
-  /** @minLength 10 */
-  description: string;
-  /** @nullable */
-  imageBase64?: string | null;
-}
+export type AnalyticsSummaryTopCategoriesItem = {
+  name: string;
+  count: number;
+};

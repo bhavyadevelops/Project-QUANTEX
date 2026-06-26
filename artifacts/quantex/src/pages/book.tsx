@@ -173,40 +173,77 @@ export default function BookTechnician() {
                 <p className="text-xs text-muted-foreground font-mono mb-4">{t("book_showing_for")} {selectedCat?.name ?? t("book_all_cats")}</p>
                 {techsLoading ? (
                   <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
-                ) : (
-                  <FormField control={form.control} name="technicianId" render={({ field }) => (
-                    <FormItem>
-                      <div className="space-y-3">
-                        {(filteredTechs.length > 0 ? filteredTechs : allTechs ?? []).map((tech) => (
-                          <button key={tech.id} type="button"
-                            onClick={() => { field.onChange(tech.id); setStep("details"); }}
-                            className={`w-full flex items-center gap-4 p-4 border rounded-lg text-left transition-all hover:border-primary/60 ${
-                              field.value === tech.id ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-muted/20"
-                            }`}>
-                            <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center flex-shrink-0">
-                              <span className="text-primary font-bold font-mono">{tech.name?.charAt(0) ?? "T"}</span>
-                            </div>
-                            <div className="flex-1">
-                              <p className="font-bold text-sm uppercase">{tech.name}</p>
-                              <p className="text-xs text-muted-foreground font-mono">{tech.skills?.slice(0, 3).join(" · ")}</p>
-                              <div className="flex items-center gap-3 mt-1">
-                                <span className="text-xs font-mono text-primary flex items-center gap-1">
-                                  <Star className="w-3 h-3 fill-primary" /> {tech.rating?.toFixed(1)} ({tech.reviewCount})
-                                </span>
-                                <span className="text-xs font-mono text-muted-foreground">${tech.hourlyRate}/hr</span>
-                                <span className="text-xs font-mono text-muted-foreground">~{tech.responseTime}</span>
+                ) : (() => {
+                  const list = filteredTechs.length > 0 ? filteredTechs : allTechs ?? [];
+                  // Score: weighted by availability, rating, completedJobs, fast response
+                  const scored = list.map((tech) => {
+                    const ratingScore = (tech.rating ?? 0) * 20;
+                    const jobScore = Math.min((tech.completedJobs ?? 0) / 2, 20);
+                    const reviewScore = Math.min((tech.reviewCount ?? 0) / 5, 10);
+                    const availBonus = tech.isAvailable ? 15 : 0;
+                    const responseStr = tech.responseTime ?? "60 min";
+                    const responseMin = parseInt(responseStr) || 60;
+                    const responseScore = Math.max(0, 15 - responseMin / 10);
+                    return { tech, score: ratingScore + jobScore + reviewScore + availBonus + responseScore };
+                  }).sort((a, b) => b.score - a.score);
+                  const recommendedId = scored[0]?.tech.id;
+
+                  return (
+                    <FormField control={form.control} name="technicianId" render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-3">
+                          {scored.map(({ tech }, idx) => {
+                            const isRecommended = tech.id === recommendedId && idx === 0;
+                            return (
+                              <div key={tech.id}>
+                                {isRecommended && (
+                                  <div className="flex items-center gap-2 mb-1.5">
+                                    <Sparkles className="w-3 h-3 text-primary" />
+                                    <span className="text-xs font-mono text-primary font-bold uppercase">{t("ai_recommended")}</span>
+                                    <span className="text-xs font-mono text-muted-foreground">— Top rated · Fastest response · Most experienced</span>
+                                  </div>
+                                )}
+                                <button type="button"
+                                  onClick={() => { field.onChange(tech.id); setStep("details"); }}
+                                  className={`w-full flex items-center gap-4 p-4 border rounded-lg text-left transition-all hover:border-primary/60 ${
+                                    field.value === tech.id
+                                      ? "border-primary bg-primary/10"
+                                      : isRecommended
+                                        ? "border-primary/50 bg-primary/5"
+                                        : "border-border bg-background hover:bg-muted/20"
+                                  }`}>
+                                  <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center flex-shrink-0">
+                                    <span className="text-primary font-bold font-mono">{tech.name?.charAt(0) ?? "T"}</span>
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <p className="font-bold text-sm uppercase">{tech.name}</p>
+                                      {isRecommended && (
+                                        <span className="text-xs font-mono bg-primary text-primary-foreground px-1.5 py-0.5 rounded">AI ★</span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground font-mono">{tech.skills?.slice(0, 3).join(" · ")}</p>
+                                    <div className="flex items-center gap-3 mt-1">
+                                      <span className="text-xs font-mono text-primary flex items-center gap-1">
+                                        <Star className="w-3 h-3 fill-primary" /> {tech.rating?.toFixed(1)} ({tech.reviewCount})
+                                      </span>
+                                      <span className="text-xs font-mono text-muted-foreground">${tech.hourlyRate}/hr</span>
+                                      <span className="text-xs font-mono text-muted-foreground">~{tech.responseTime}</span>
+                                    </div>
+                                  </div>
+                                  <div className={`text-xs font-mono px-2 py-1 rounded ${tech.isAvailable ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                                    {tech.isAvailable ? "AVAIL" : "BUSY"}
+                                  </div>
+                                </button>
                               </div>
-                            </div>
-                            <div className={`text-xs font-mono px-2 py-1 rounded ${tech.isAvailable ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
-                              {tech.isAvailable ? "AVAIL" : "BUSY"}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                )}
+                            );
+                          })}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  );
+                })()}
                 <Button type="button" variant="ghost" size="sm" className="mt-4 font-mono text-xs" onClick={() => setStep("category")}>
                   {t("book_back")}
                 </Button>

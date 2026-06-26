@@ -8,6 +8,7 @@ import bookingsRouter from "./bookings";
 import reviewsRouter from "./reviews";
 import dashboardRouter from "./dashboard";
 import aiRouter from "./ai";
+import analyticsRouter from "./analytics";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(bookingsRouter);
 router.use(reviewsRouter);
 router.use(dashboardRouter);
 router.use(aiRouter);
+router.use(analyticsRouter);
 
 export default router;

@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AnalyticsSummary,
   AuthResponse,
   Booking,
   BookingInput,
@@ -38,6 +39,8 @@ import type {
   ReviewInput,
   ServiceCategory,
   Technician,
+  TechnicianBriefInput,
+  TechnicianBriefResult,
   TechnicianDashboard,
   TechnicianInput,
   TechnicianUpdate,
@@ -1792,4 +1795,152 @@ export const useAnalyzeIssue = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getAnalyzeIssueMutationOptions(options));
     }
+
+export const getGetTechnicianBriefUrl = () => {
+
+
+
+
+  return `/api/ai/technician-brief`
+}
+
+/**
+ * @summary AI-generated brief for a technician before a job
+ */
+export const getTechnicianBrief = async (technicianBriefInput: TechnicianBriefInput, options?: RequestInit): Promise<TechnicianBriefResult> => {
+
+  return customFetch<TechnicianBriefResult>(getGetTechnicianBriefUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      technicianBriefInput,)
+  }
+);}
+
+
+
+
+export const getGetTechnicianBriefMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getTechnicianBrief>>, TError,{data: BodyType<TechnicianBriefInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof getTechnicianBrief>>, TError,{data: BodyType<TechnicianBriefInput>}, TContext> => {
+
+const mutationKey = ['getTechnicianBrief'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getTechnicianBrief>>, {data: BodyType<TechnicianBriefInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  getTechnicianBrief(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GetTechnicianBriefMutationResult = NonNullable<Awaited<ReturnType<typeof getTechnicianBrief>>>
+    export type GetTechnicianBriefMutationBody = BodyType<TechnicianBriefInput>
+    export type GetTechnicianBriefMutationError = ErrorType<unknown>
+
+    /**
+ * @summary AI-generated brief for a technician before a job
+ */
+export const useGetTechnicianBrief = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getTechnicianBrief>>, TError,{data: BodyType<TechnicianBriefInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof getTechnicianBrief>>,
+        TError,
+        {data: BodyType<TechnicianBriefInput>},
+        TContext
+      > => {
+      return useMutation(getGetTechnicianBriefMutationOptions(options));
+    }
+
+export const getGetAnalyticsSummaryUrl = () => {
+
+
+
+
+  return `/api/analytics/summary`
+}
+
+/**
+ * @summary Platform-wide analytics summary
+ */
+export const getAnalyticsSummary = async ( options?: RequestInit): Promise<AnalyticsSummary> => {
+
+  return customFetch<AnalyticsSummary>(getGetAnalyticsSummaryUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAnalyticsSummaryQueryKey = () => {
+    return [
+    `/api/analytics/summary`
+    ] as const;
+    }
+
+
+export const getGetAnalyticsSummaryQueryOptions = <TData = Awaited<ReturnType<typeof getAnalyticsSummary>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsSummary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAnalyticsSummaryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAnalyticsSummary>>> = ({ signal }) => getAnalyticsSummary({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsSummary>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAnalyticsSummaryQueryResult = NonNullable<Awaited<ReturnType<typeof getAnalyticsSummary>>>
+export type GetAnalyticsSummaryQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Platform-wide analytics summary
+ */
+
+export function useGetAnalyticsSummary<TData = Awaited<ReturnType<typeof getAnalyticsSummary>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsSummary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAnalyticsSummaryQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 

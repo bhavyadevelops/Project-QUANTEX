@@ -236,6 +236,8 @@ export interface TechnicianDashboard {
 export interface IssueAnalysisInput {
   /** @minLength 10 */
   description: string;
+  /** @nullable */
+  imageBase64?: string | null;
 }
 
 export type IssueAnalysisResultUrgency = typeof IssueAnalysisResultUrgency[keyof typeof IssueAnalysisResultUrgency];
@@ -245,16 +247,80 @@ export const IssueAnalysisResultUrgency = {
   low: 'low',
   medium: 'medium',
   high: 'high',
+  critical: 'critical',
+} as const;
+
+export type IssueAnalysisResultSeverity = typeof IssueAnalysisResultSeverity[keyof typeof IssueAnalysisResultSeverity];
+
+
+export const IssueAnalysisResultSeverity = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  critical: 'critical',
 } as const;
 
 export interface IssueAnalysisResult {
   category: string;
   urgency: IssueAnalysisResultUrgency;
+  severity?: IssueAnalysisResultSeverity;
+  /** @nullable */
+  confidence?: number | null;
   troubleshootingSteps: string[];
   technicianType: string;
   summary: string;
   /** @nullable */
   suggestedCategoryId?: number | null;
+  /** @nullable */
+  estimatedCostMin?: number | null;
+  /** @nullable */
+  estimatedCostMax?: number | null;
+  /** @nullable */
+  estimatedDuration?: string | null;
+  safetyPrecautions?: string[];
+  requiresTechnician: boolean;
+  isEmergency: boolean;
+  /** @nullable */
+  emergencyType?: string | null;
+}
+
+export interface TechnicianBriefInput {
+  issueDescription: string;
+  categoryName: string;
+  /** @nullable */
+  customerName?: string | null;
+  /** @nullable */
+  address?: string | null;
+}
+
+export interface TechnicianBriefResult {
+  issueSummary: string;
+  suggestedParts: string[];
+  safetyRecommendations: string[];
+  estimatedDuration: string;
+  toolsNeeded: string[];
+  /** @nullable */
+  difficultyLevel?: string | null;
+  /** @nullable */
+  customerTips?: string | null;
+}
+
+export type AnalyticsSummaryTopCategoriesItem = {
+  name: string;
+  count: number;
+};
+
+export interface AnalyticsSummary {
+  totalRequests: number;
+  completedJobs: number;
+  pendingJobs: number;
+  cancelledJobs: number;
+  activeJobs?: number;
+  averageRepairCost: number;
+  technicianCount: number;
+  customerCount: number;
+  averageTechnicianRating?: number;
+  topCategories: AnalyticsSummaryTopCategoriesItem[];
 }
 
 export type ListTechniciansParams = {

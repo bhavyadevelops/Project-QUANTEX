@@ -26,6 +26,7 @@ import Settings from "@/pages/settings";
 
 import TechnicianDashboard from "@/pages/technician/dashboard";
 import TechnicianBookings from "@/pages/technician/bookings";
+import Analytics from "@/pages/analytics";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,6 +67,9 @@ function Router() {
       </Route>
       <Route path="/technician/bookings">
         <ProtectedRoute allowedRoles={["technician"]}><TechnicianBookings /></ProtectedRoute>
+      </Route>
+      <Route path="/analytics">
+        <ProtectedRoute allowedRoles={["customer", "technician"]}><Analytics /></ProtectedRoute>
       </Route>
 
       <Route component={NotFound} />

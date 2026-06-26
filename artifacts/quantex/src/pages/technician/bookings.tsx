@@ -1,9 +1,160 @@
 import React, { useState } from "react";
-import { useListBookings, useUpdateBookingStatus, BookingStatusUpdateStatus, ListBookingsStatus } from "@workspace/api-client-react";
+import {
+  useListBookings, useUpdateBookingStatus, useGetTechnicianBrief,
+  BookingStatusUpdateStatus, ListBookingsStatus,
+} from "@workspace/api-client-react";
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CheckCircle, XCircle, Zap, Clock, MapPin, User, Plus } from "lucide-react";
+import {
+  Loader2, CheckCircle, XCircle, Zap, Clock, MapPin, User, Plus,
+  Sparkles, ChevronDown, ChevronUp, Wrench, ShieldAlert, Package,
+} from "lucide-react";
+
+const DIFFICULTY_COLOR: Record<string, string> = {
+  Easy:     "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
+  Moderate: "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",
+  Complex:  "text-orange-400 border-orange-400/30 bg-orange-400/10",
+  Advanced: "text-red-400 border-red-400/30 bg-red-400/10",
+};
+
+function AIBriefPanel({ jobId, issueDescription, categoryName, customerName, address, t }: {
+  jobId: number;
+  issueDescription: string;
+  categoryName: string;
+  customerName: string | null | undefined;
+  address: string | null | undefined;
+  t: (k: string) => string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [brief, setBrief] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const getTechnicianBrief = useGetTechnicianBrief();
+  const { toast } = useToast();
+
+  const generate = async () => {
+    if (brief) { setOpen(!open); return; }
+    setLoading(true);
+    setOpen(true);
+    try {
+      const result = await getTechnicianBrief.mutateAsync({
+        data: { issueDescription, categoryName, customerName: customerName ?? null, address: address ?? null },
+      });
+      setBrief(result);
+    } catch {
+      toast({ title: "AI Brief Failed", description: "Could not generate brief. Try again.", variant: "destructive" });
+      setOpen(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="border border-primary/20 rounded-lg overflow-hidden mt-3">
+      <button
+        onClick={generate}
+        className="w-full flex items-center gap-2 px-4 py-2.5 bg-primary/5 hover:bg-primary/10 transition-colors text-left"
+      >
+        <Sparkles className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+        <span className="text-xs font-mono text-primary uppercase font-bold flex-1">{t("tech_ai_brief")}</span>
+        {loading ? (
+          <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
+        ) : open ? (
+          <ChevronUp className="w-3.5 h-3.5 text-primary" />
+        ) : (
+          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+        )}
+      </button>
+
+      {open && !loading && brief && (
+        <div className="p-4 space-y-3 bg-card/50 border-t border-primary/20">
+          {/* Summary */}
+          <div>
+            <p className="text-xs font-mono text-primary uppercase mb-1 font-bold">{t("tech_ai_summary")}</p>
+            <p className="text-xs font-mono text-muted-foreground leading-relaxed">{brief.issueSummary}</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Difficulty + Duration */}
+            <div className="space-y-2">
+              {brief.difficultyLevel && (
+                <div>
+                  <p className="text-xs font-mono text-muted-foreground uppercase mb-1">{t("tech_ai_difficulty")}</p>
+                  <span className={`text-xs font-mono border px-2 py-0.5 rounded ${DIFFICULTY_COLOR[brief.difficultyLevel] ?? DIFFICULTY_COLOR.Moderate}`}>
+                    {brief.difficultyLevel}
+                  </span>
+                </div>
+              )}
+              <div>
+                <p className="text-xs font-mono text-muted-foreground uppercase mb-1">{t("tech_ai_duration")}</p>
+                <p className="text-xs font-mono text-primary font-bold">{brief.estimatedDuration}</p>
+              </div>
+            </div>
+
+            {/* Tools */}
+            {brief.toolsNeeded?.length > 0 && (
+              <div>
+                <p className="text-xs font-mono text-muted-foreground uppercase mb-1 flex items-center gap-1">
+                  <Wrench className="w-3 h-3" /> {t("tech_ai_tools")}
+                </p>
+                <ul className="space-y-0.5">
+                  {brief.toolsNeeded.map((tool: string, i: number) => (
+                    <li key={i} className="text-xs font-mono text-foreground flex items-center gap-1">
+                      <span className="text-primary">•</span> {tool}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Suggested Parts */}
+          {brief.suggestedParts?.length > 0 && (
+            <div>
+              <p className="text-xs font-mono text-muted-foreground uppercase mb-1 flex items-center gap-1">
+                <Package className="w-3 h-3" /> {t("tech_ai_parts")}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {brief.suggestedParts.map((part: string, i: number) => (
+                  <span key={i} className="text-xs font-mono border border-border px-2 py-0.5 rounded bg-muted/30 text-foreground">{part}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Safety */}
+          {brief.safetyRecommendations?.length > 0 && (
+            <div className="border border-yellow-400/30 bg-yellow-400/5 p-3 rounded">
+              <p className="text-xs font-mono text-yellow-400 uppercase mb-1 font-bold flex items-center gap-1">
+                <ShieldAlert className="w-3 h-3" /> {t("tech_ai_safety")}
+              </p>
+              {brief.safetyRecommendations.map((rec: string, i: number) => (
+                <p key={i} className="text-xs font-mono text-yellow-300/80 flex items-start gap-1">
+                  <span className="text-yellow-400 flex-shrink-0">•</span> {rec}
+                </p>
+              ))}
+            </div>
+          )}
+
+          {/* Customer Tips */}
+          {brief.customerTips && (
+            <div className="border border-blue-400/20 bg-blue-400/5 p-3 rounded">
+              <p className="text-xs font-mono text-blue-400 uppercase mb-1 font-bold">{t("tech_ai_tips")}</p>
+              <p className="text-xs font-mono text-blue-300/80">{brief.customerTips}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {open && loading && (
+        <div className="p-4 flex items-center gap-2 border-t border-primary/20 bg-card/50">
+          <Loader2 className="w-4 h-4 animate-spin text-primary" />
+          <span className="text-xs font-mono text-muted-foreground">{t("tech_ai_generating")}</span>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TechnicianBookings() {
   const [filter, setFilter] = useState<string>("");
@@ -48,6 +199,8 @@ export default function TechnicianBookings() {
     }
   };
 
+  const AI_BRIEF_STATUSES = new Set(["pending", "accepted", "in_progress"]);
+
   return (
     <div className="min-h-screen bg-background py-10">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -77,6 +230,7 @@ export default function TechnicianBookings() {
             {bookings.map((job) => {
               const cfg = STATUS_CONFIG[job.status ?? "pending"] ?? STATUS_CONFIG.pending;
               const nextAction = job.status ? NEXT_STATUS[job.status] : null;
+              const showAiBrief = AI_BRIEF_STATUSES.has(job.status ?? "");
               return (
                 <div key={job.id} className="border border-border bg-card p-5 rounded-lg hover:border-primary/40 transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
@@ -101,8 +255,9 @@ export default function TechnicianBookings() {
                       </span>
                     )}
                   </div>
+
                   {nextAction && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mb-1">
                       <Button size="sm" className="uppercase font-mono text-xs" onClick={() => handleStatusUpdate(job.id, nextAction.next)} disabled={updateStatus.isPending}>
                         {updateStatus.isPending ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <CheckCircle className="w-3 h-3 mr-1" />}
                         {nextAction.label}
@@ -114,6 +269,18 @@ export default function TechnicianBookings() {
                         </Button>
                       )}
                     </div>
+                  )}
+
+                  {/* AI Brief panel */}
+                  {showAiBrief && (
+                    <AIBriefPanel
+                      jobId={job.id}
+                      issueDescription={job.issueDescription ?? ""}
+                      categoryName={job.categoryName ?? "Technical Issue"}
+                      customerName={job.customerName}
+                      address={job.address}
+                      t={t}
+                    />
                   )}
                 </div>
               );

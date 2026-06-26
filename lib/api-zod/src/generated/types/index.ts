@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './analyticsSummary';
+export * from './analyticsSummaryTopCategoriesItem';
 export * from './authResponse';
 export * from './booking';
 export * from './bookingInput';
@@ -16,6 +18,7 @@ export * from './customerDashboard';
 export * from './healthStatus';
 export * from './issueAnalysisInput';
 export * from './issueAnalysisResult';
+export * from './issueAnalysisResultSeverity';
 export * from './issueAnalysisResultUrgency';
 export * from './listBookingsParams';
 export * from './listBookingsRole';
@@ -30,6 +33,8 @@ export * from './review';
 export * from './reviewInput';
 export * from './serviceCategory';
 export * from './technician';
+export * from './technicianBriefInput';
+export * from './technicianBriefResult';
 export * from './technicianDashboard';
 export * from './technicianInput';
 export * from './technicianUpdate';

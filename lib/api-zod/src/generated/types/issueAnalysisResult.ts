@@ -5,14 +5,29 @@
  * QUANTEX API - AI-powered technician booking platform
  * OpenAPI spec version: 0.1.0
  */
+import type { IssueAnalysisResultSeverity } from './issueAnalysisResultSeverity';
 import type { IssueAnalysisResultUrgency } from './issueAnalysisResultUrgency';
 
 export interface IssueAnalysisResult {
   category: string;
   urgency: IssueAnalysisResultUrgency;
+  severity?: IssueAnalysisResultSeverity;
+  /** @nullable */
+  confidence?: number | null;
   troubleshootingSteps: string[];
   technicianType: string;
   summary: string;
   /** @nullable */
   suggestedCategoryId?: number | null;
+  /** @nullable */
+  estimatedCostMin?: number | null;
+  /** @nullable */
+  estimatedCostMax?: number | null;
+  /** @nullable */
+  estimatedDuration?: string | null;
+  safetyPrecautions?: string[];
+  requiresTechnician: boolean;
+  isEmergency: boolean;
+  /** @nullable */
+  emergencyType?: string | null;
 }
