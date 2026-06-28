@@ -30,7 +30,10 @@ router.post("/ai/analyze-issue", async (req, res): Promise<void> => {
       messages: [
         {
           role: "system",
-          content: `You are QUANTEX AI, an expert technical support analyzer. Analyze the user's technical issue and respond ONLY with valid JSON:
+          content: `You are QUANTEX AI, an expert technical support analyzer. Analyze the user's technical issue and respond ONLY with valid JSON.
+
+LANGUAGE RULE: Detect the language of the user's input. Write all descriptive text fields (summary, troubleshootingSteps, technicianType, safetyPrecautions, estimatedDuration, emergencyType) in that same detected language. Keep all JSON keys in English.
+
 {
   "category": "service category (e.g. PC/Laptop Repair, WiFi/Network, Device Setup, Software Issues, Appliance Installation, Smart Device Setup, Assembly & Installation)",
   "urgency": "low | medium | high | critical",
