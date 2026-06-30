@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useParams, Link, useLocation } from "wouter";
-import { useGetBooking, useGetBookingTracking, useUpdateBookingStatus, BookingStatusUpdateStatus } from "@workspace/api-client-react";
+import { useGetBooking, useGetBookingTracking, useUpdateBookingStatus, BookingStatus } from "@workspace/api-client-react";
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,41 +8,94 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, MapPin, CheckCircle, Zap, Star, ArrowLeft, XCircle } from "lucide-react";
+import {
+  Loader2, MapPin, CheckCircle, Zap, Star, ArrowLeft, XCircle,
+  Navigation, Phone, Clock, Car, Wrench, Package, CreditCard, Search,
+} from "lucide-react";
+import { useRealtimeEvents, type TechnicianLocationUpdatedPayload } from "@/hooks/use-realtime-events";
+import { useQueryClient } from "@tanstack/react-query";
 
+// Extended status order for the full lifecycle
 const STATUS_ORDER: Record<string, number> = {
-  pending: 0, accepted: 1, in_progress: 2, completed: 3, cancelled: -1,
+  searching: 0,
+  assigned: 1,
+  pending: 1,
+  accepted: 2,
+  travelling: 3,
+  arriving: 4,
+  reached: 5,
+  in_progress: 6,
+  waiting_for_parts: 6,
+  completed: 7,
+  payment_completed: 8,
+  cancelled: -1,
 };
-const CANCELLABLE = new Set(["pending", "accepted"]);
+
+const CANCELLABLE = new Set(["searching", "assigned", "pending", "accepted"]);
+
+// Timeline steps for customer view
+const TIMELINE_STEPS = [
+  { key: "pending",     icon: Search,     label: "Booking Requested",    desc: "Your request has been sent" },
+  { key: "accepted",   icon: CheckCircle, label: "Technician Assigned",   desc: "A technician accepted your job" },
+  { key: "travelling", icon: Car,         label: "On The Way",            desc: "Technician is heading to you" },
+  { key: "in_progress",icon: Wrench,      label: "Work In Progress",      desc: "Technician is working on your issue" },
+  { key: "completed",  icon: CheckCircle, label: "Job Completed",         desc: "Your issue has been resolved" },
+  { key: "payment_completed", icon: CreditCard, label: "Payment Confirmed", desc: "Payment processed successfully" },
+];
+
+function MapEmbed({ lat, lng }: { lat: number; lng: number }) {
+  const src = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+  return (
+    <div className="w-full h-48 rounded-lg overflow-hidden border border-primary/30 mt-3">
+      <iframe
+        src={src}
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        title="Technician location"
+      />
+    </div>
+  );
+}
 
 export default function Tracking() {
   const { id } = useParams<{ id: string }>();
   const [_, setLocation] = useLocation();
   const { t } = useLanguage();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const bookingId = parseInt(id ?? "0");
-  const [simEta, setSimEta] = useState(Math.floor(Math.random() * 20) + 5);
-  const [simProgress, setSimProgress] = useState(10);
+  const [liveLocation, setLiveLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const { data: booking, isLoading, refetch } = useGetBooking(bookingId, {
-    query: { enabled: !!bookingId, refetchInterval: 15_000 } as any
+    query: { enabled: !!bookingId } as any
   });
   const { data: tracking } = useGetBookingTracking(bookingId, {
-    query: { enabled: !!bookingId, refetchInterval: 10_000 } as any
+    query: { enabled: !!bookingId } as any
   });
   const updateStatus = useUpdateBookingStatus();
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSimEta((prev) => Math.max(0, prev - 1));
-      setSimProgress((prev) => Math.min(95, prev + 2));
-    }, 30_000);
-    return () => clearInterval(interval);
-  }, []);
+  // Subscribe to real-time events for this booking
+  useRealtimeEvents({
+    bookingId,
+    technicianId: booking?.technicianId,
+    enabled: !!bookingId,
+    onEvent: (type, payload) => {
+      if (type === "booking_status_changed") {
+        refetch();
+      }
+      if (type === "technician_location_updated") {
+        const p = payload as TechnicianLocationUpdatedPayload;
+        setLiveLocation({ lat: p.latitude, lng: p.longitude });
+      }
+    },
+  });
 
   const handleCancel = async () => {
     try {
-      await updateStatus.mutateAsync({ id: bookingId, data: { status: BookingStatusUpdateStatus.cancelled } });
+      await updateStatus.mutateAsync({ id: bookingId, data: { status: BookingStatus.cancelled } });
       toast({ title: t("cancel_success"), description: t("cancel_success_desc") });
       refetch();
       setLocation("/history");
@@ -51,17 +104,11 @@ export default function Tracking() {
     }
   };
 
-  const displayEta  = tracking?.etaMinutes ?? simEta;
-  const displayProg = tracking?.progress   ?? simProgress;
-  const displayLat  = tracking?.technicianLat;
-  const displayLng  = tracking?.technicianLng;
-
-  const TIMELINE_STEPS = [
-    { key: "pending",     label: t("track_s1"), desc: t("track_s1d") },
-    { key: "accepted",    label: t("track_s2"), desc: t("track_s2d") },
-    { key: "in_progress", label: t("track_s3"), desc: t("track_s3d") },
-    { key: "completed",   label: t("track_s4"), desc: t("track_s4d") },
-  ];
+  const displayLat = liveLocation?.lat ?? tracking?.technicianLat ?? null;
+  const displayLng = liveLocation?.lng ?? tracking?.technicianLng ?? null;
+  const displayEta = tracking?.etaMinutes ?? 0;
+  const displayProg = tracking?.progress ?? 0;
+  const displayDist = (tracking as any)?.distanceKm ?? null;
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
 
@@ -72,8 +119,25 @@ export default function Tracking() {
     </div>
   );
 
-  const currentStepIdx = STATUS_ORDER[booking.status ?? "pending"] ?? 0;
-  const canCancel = CANCELLABLE.has(booking.status ?? "");
+  const currentStatus = booking.status ?? "pending";
+  const currentStepIdx = STATUS_ORDER[currentStatus] ?? 0;
+  const canCancel = CANCELLABLE.has(currentStatus);
+  const isActive = !["completed", "payment_completed", "cancelled"].includes(currentStatus);
+
+  const statusLabel: Record<string, string> = {
+    searching: "SEARCHING",
+    assigned: "ASSIGNED",
+    pending: "PENDING",
+    accepted: "ACCEPTED",
+    travelling: "EN ROUTE",
+    arriving: "ARRIVING",
+    reached: "ARRIVED",
+    in_progress: "IN PROGRESS",
+    waiting_for_parts: "AWAITING PARTS",
+    completed: "COMPLETED",
+    payment_completed: "PAID",
+    cancelled: "CANCELLED",
+  };
 
   return (
     <div className="min-h-screen bg-background py-10">
@@ -85,10 +149,15 @@ export default function Tracking() {
               <Link href="/dashboard"><ArrowLeft className="w-3 h-3 mr-1" /> {t("track_dashboard")}</Link>
             </Button>
             <p className="text-primary font-mono text-sm uppercase tracking-widest">{t("track_label")}</p>
-            <h1 className="text-2xl font-bold uppercase mt-1">{t("track_label").split(" ")[0]} #{bookingId}</h1>
+            <h1 className="text-2xl font-bold uppercase mt-1">BOOKING #{bookingId}</h1>
+            <div className="flex items-center gap-2 mt-2">
+              {isActive && <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
+              <span className={`text-xs font-mono font-bold uppercase ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+                {statusLabel[currentStatus] ?? currentStatus.replace("_", " ").toUpperCase()}
+              </span>
+            </div>
           </div>
 
-          {/* Cancel button — only for pending/accepted */}
           {canCancel && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -123,37 +192,61 @@ export default function Tracking() {
         </div>
 
         {/* Live status card */}
-        {booking.status !== "completed" && booking.status !== "cancelled" && (
+        {isActive && (
           <div className="border border-primary/40 bg-primary/5 p-6 rounded-lg mb-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 <span className="text-primary font-mono text-sm font-bold uppercase">
-                  {booking.status === "in_progress" ? t("track_en_route") : t("track_processing")}
+                  {["travelling", "arriving"].includes(currentStatus)
+                    ? "TECHNICIAN EN ROUTE"
+                    : currentStatus === "in_progress"
+                      ? "WORK IN PROGRESS"
+                      : "PROCESSING"}
                 </span>
               </div>
-              {booking.status === "in_progress" && (
+              {displayEta > 0 && (
                 <div className="text-right">
                   <p className="text-2xl font-bold font-mono text-primary">{displayEta} min</p>
                   <p className="text-xs text-muted-foreground font-mono">{t("track_eta")}</p>
                 </div>
               )}
             </div>
+
+            {/* Progress bar */}
             <div className="w-full bg-border rounded-full h-2 mb-2">
               <div className="bg-primary h-2 rounded-full transition-all duration-1000" style={{ width: `${displayProg}%` }} />
             </div>
-            <p className="text-xs font-mono text-muted-foreground text-right">{displayProg}%</p>
-            {displayLat != null && displayLng != null && (
-              <div className="mt-4 flex items-center gap-2 text-xs font-mono text-muted-foreground border border-border/50 px-3 py-2 rounded bg-background/30">
+            <p className="text-xs font-mono text-muted-foreground text-right mb-4">{displayProg}%</p>
+
+            {/* Distance */}
+            {displayDist !== null && (
+              <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground mb-3">
+                <Navigation className="w-3 h-3 text-primary" />
+                <span>{displayDist} km away</span>
+              </div>
+            )}
+
+            {/* Map */}
+            {displayLat != null && displayLng != null ? (
+              <div>
+                <p className="text-xs font-mono text-muted-foreground mb-1 flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-primary" />
+                  TECHNICIAN LOCATION — {displayLat.toFixed(4)}, {displayLng.toFixed(4)}
+                </p>
+                <MapEmbed lat={displayLat} lng={displayLng} />
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground border border-border/50 px-3 py-2 rounded bg-background/30">
                 <MapPin className="w-3 h-3 text-primary" />
-                {displayLat.toFixed(4)}, {displayLng.toFixed(4)}
+                Waiting for technician location update...
               </div>
             )}
           </div>
         )}
 
         {/* Cancelled banner */}
-        {booking.status === "cancelled" && (
+        {currentStatus === "cancelled" && (
           <div className="border border-red-400/40 bg-red-400/5 p-6 rounded-lg mb-6 flex items-center gap-4">
             <XCircle className="w-10 h-10 text-red-400 flex-shrink-0" />
             <div>
@@ -164,7 +257,7 @@ export default function Tracking() {
         )}
 
         {/* Completed banner */}
-        {booking.status === "completed" && (
+        {(currentStatus === "completed" || currentStatus === "payment_completed") && (
           <div className="border border-emerald-400/40 bg-emerald-400/5 p-6 rounded-lg mb-6 flex items-center gap-4">
             <CheckCircle className="w-10 h-10 text-emerald-400 flex-shrink-0" />
             <div>
@@ -174,23 +267,37 @@ export default function Tracking() {
           </div>
         )}
 
-        {/* Timeline */}
+        {/* Lifecycle stepper */}
         <div className="border border-border bg-card rounded-lg p-6 mb-6">
           <h2 className="font-bold uppercase font-mono text-sm mb-4 text-primary">{t("track_timeline")}</h2>
           <div className="space-y-0">
             {TIMELINE_STEPS.map((step, i) => {
-              const done = i <= currentStepIdx;
-              const active = i === currentStepIdx;
+              const stepIdx = STATUS_ORDER[step.key] ?? i;
+              const done = stepIdx <= currentStepIdx && currentStatus !== "cancelled";
+              const active = stepIdx === currentStepIdx && currentStatus !== "cancelled";
+              const Icon = step.icon;
               return (
                 <div key={step.key} className="flex gap-4">
                   <div className="flex flex-col items-center">
-                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${done ? "bg-primary border-primary text-primary-foreground" : "border-border bg-background text-muted-foreground"}`}>
-                      {done ? (active && booking.status !== "completed" ? <Zap className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />) : <span className="text-xs font-mono">{i + 1}</span>}
+                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                      done
+                        ? "bg-primary border-primary text-primary-foreground"
+                        : "border-border bg-background text-muted-foreground"
+                    }`}>
+                      {done
+                        ? (active && !["completed", "payment_completed"].includes(currentStatus)
+                            ? <Zap className="w-4 h-4" />
+                            : <Icon className="w-4 h-4" />)
+                        : <span className="text-xs font-mono">{i + 1}</span>}
                     </div>
-                    {i < TIMELINE_STEPS.length - 1 && <div className={`w-0.5 h-8 ${done ? "bg-primary" : "bg-border"}`} />}
+                    {i < TIMELINE_STEPS.length - 1 && (
+                      <div className={`w-0.5 h-8 ${done ? "bg-primary" : "bg-border"}`} />
+                    )}
                   </div>
                   <div className="pb-6">
-                    <p className={`font-bold text-sm uppercase ${done ? "text-foreground" : "text-muted-foreground"}`}>{step.label}</p>
+                    <p className={`font-bold text-sm uppercase ${done ? "text-foreground" : "text-muted-foreground"}`}>
+                      {step.label}
+                    </p>
                     <p className="text-xs font-mono text-muted-foreground">{step.desc}</p>
                   </div>
                 </div>
@@ -199,7 +306,7 @@ export default function Tracking() {
           </div>
         </div>
 
-        {/* Technician */}
+        {/* Technician card */}
         {booking.technicianName && (
           <div className="border border-border bg-card rounded-lg p-6 mb-6">
             <h2 className="font-bold uppercase font-mono text-sm mb-4 text-primary">{t("track_your_tech")}</h2>
@@ -213,6 +320,24 @@ export default function Tracking() {
                   <Star className="w-3 h-3 fill-primary text-primary" />
                   <span className="text-xs font-mono text-primary">{t("track_expert")}</span>
                 </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                {displayLat != null && displayLng != null && (
+                  <a
+                    href={`https://maps.google.com/?q=${displayLat},${displayLng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button size="sm" variant="outline" className="text-xs font-mono uppercase">
+                      <Navigation className="w-3 h-3 mr-1" /> NAVIGATE
+                    </Button>
+                  </a>
+                )}
+                <a href="tel:+18005551234">
+                  <Button size="sm" variant="outline" className="text-xs font-mono uppercase text-primary border-primary/40 hover:bg-primary/10">
+                    <Phone className="w-3 h-3 mr-1" /> CALL SUPPORT
+                  </Button>
+                </a>
               </div>
             </div>
           </div>

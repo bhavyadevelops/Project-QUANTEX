@@ -1,19 +1,148 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/lib/auth";
-import { useGetTechnicianDashboard, useListBookings } from "@workspace/api-client-react";
+import {
+  useGetTechnicianDashboard, useListBookings, useGetMyTechnicianProfile,
+  useUpdateTechnicianLocation, useUpdateTechnicianStatus,
+  TechnicianStatus,
+} from "@workspace/api-client-react";
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { Loader2, Zap, CheckCircle, Star, DollarSign, Clock, ArrowRight, AlertCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useRealtimeEvents } from "@/hooks/use-realtime-events";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  Loader2, Zap, CheckCircle, Star, DollarSign, Clock, ArrowRight, AlertCircle,
+  Wifi, WifiOff, MapPin, Navigation, Coffee, Shield,
+} from "lucide-react";
+
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode; description: string }> = {
+  online:         { label: "ONLINE",          color: "text-emerald-400 border-emerald-400",   icon: <Wifi className="w-4 h-4" />,       description: "Accepting new bookings" },
+  offline:        { label: "OFFLINE",         color: "text-muted-foreground border-border",   icon: <WifiOff className="w-4 h-4" />,    description: "Not accepting bookings" },
+  busy:           { label: "BUSY",            color: "text-primary border-primary",            icon: <Zap className="w-4 h-4" />,        description: "Working on a job" },
+  on_break:       { label: "ON BREAK",        color: "text-yellow-400 border-yellow-400",     icon: <Coffee className="w-4 h-4" />,     description: "Taking a short break" },
+  emergency_only: { label: "EMERGENCY ONLY",  color: "text-red-400 border-red-400",           icon: <Shield className="w-4 h-4" />,     description: "Emergency jobs only" },
+};
 
 export default function TechnicianDashboard() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const { data: dashboard, isLoading } = useGetTechnicianDashboard();
   const { data: pendingJobs } = useListBookings({ status: "pending" });
   const { data: activeJobs } = useListBookings({ status: "in_progress" });
+  const { data: profile, refetch: refetchProfile } = useGetMyTechnicianProfile({
+    query: {} as any
+  });
+
+  const updateLocation = useUpdateTechnicianLocation();
+  const updateStatus = useUpdateTechnicianStatus();
+
+  const [isTracking, setIsTracking] = useState(false);
+  const [currentCoords, setCurrentCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const locationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // SSE: refresh dashboard on realtime events
+  useRealtimeEvents({
+    technicianId: profile?.id,
+    enabled: !!profile?.id,
+    onEvent: (type) => {
+      if (type === "booking_status_changed") {
+        queryClient.invalidateQueries({ queryKey: ["listBookings"] });
+        queryClient.invalidateQueries({ queryKey: ["getTechnicianDashboard"] });
+      }
+    },
+  });
+
+  const currentStatus = profile?.currentStatus ?? "offline";
+
+  const sendLocation = async (lat: number, lng: number) => {
+    if (!profile?.id) return;
+    try {
+      await updateLocation.mutateAsync({
+        id: profile.id,
+        data: { latitude: lat, longitude: lng },
+      });
+    } catch {}
+  };
+
+  const startTracking = () => {
+    if (!navigator.geolocation) {
+      toast({ title: "GPS Unavailable", description: "Your browser does not support geolocation.", variant: "destructive" });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setCurrentCoords({ lat: latitude, lng: longitude });
+        await sendLocation(latitude, longitude);
+
+        locationIntervalRef.current = setInterval(() => {
+          navigator.geolocation.getCurrentPosition(
+            async (p) => {
+              setCurrentCoords({ lat: p.coords.latitude, lng: p.coords.longitude });
+              await sendLocation(p.coords.latitude, p.coords.longitude);
+            },
+            () => {},
+            { enableHighAccuracy: true }
+          );
+        }, 30_000);
+
+        setIsTracking(true);
+        toast({ title: "GPS ACTIVE", description: "Your location is being shared with active customers." });
+      },
+      (err) => {
+        toast({ title: "GPS Permission Denied", description: err.message, variant: "destructive" });
+      },
+      { enableHighAccuracy: true }
+    );
+  };
+
+  const stopTracking = () => {
+    if (locationIntervalRef.current) {
+      clearInterval(locationIntervalRef.current);
+      locationIntervalRef.current = null;
+    }
+    setIsTracking(false);
+    setCurrentCoords(null);
+    toast({ title: "GPS STOPPED", description: "Location sharing disabled." });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (locationIntervalRef.current) {
+        clearInterval(locationIntervalRef.current);
+      }
+    };
+  }, []);
+
+  const handleStatusChange = async (newStatus: TechnicianStatus) => {
+    if (!profile?.id) return;
+
+    // Going online also starts GPS
+    if (newStatus === TechnicianStatus.online && !isTracking) {
+      startTracking();
+    }
+    // Going offline stops GPS
+    if (newStatus === TechnicianStatus.offline && isTracking) {
+      stopTracking();
+    }
+
+    try {
+      await updateStatus.mutateAsync({ id: profile.id, data: { currentStatus: newStatus } });
+      refetchProfile();
+      toast({ title: "STATUS UPDATED", description: `Now: ${STATUS_CONFIG[newStatus]?.label ?? newStatus}` });
+    } catch (err: any) {
+      toast({ title: "Update Failed", description: err.message ?? "Please try again.", variant: "destructive" });
+    }
+  };
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+
+  const statusCfg = STATUS_CONFIG[currentStatus] ?? STATUS_CONFIG.offline;
 
   return (
     <div className="min-h-screen bg-background py-10">
@@ -22,12 +151,20 @@ export default function TechnicianDashboard() {
           <div>
             <p className="text-primary font-mono text-sm uppercase tracking-widest">{t("tech_portal")}</p>
             <h1 className="text-3xl font-bold uppercase mt-1">{t("tech_console")} {user?.name?.split(" ")[0]}</h1>
-            <div className="flex items-center gap-2 mt-2">
-              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-mono text-primary uppercase">{t("tech_active_op")}</span>
+            <div className="flex items-center gap-3 mt-2 flex-wrap">
+              <div className={`flex items-center gap-1.5 border px-2.5 py-1 rounded text-xs font-mono font-bold ${statusCfg.color}`}>
+                {statusCfg.icon}
+                {statusCfg.label}
+              </div>
+              {isTracking && currentCoords && (
+                <div className="flex items-center gap-1 text-xs font-mono text-primary">
+                  <MapPin className="w-3 h-3 animate-pulse" />
+                  {currentCoords.lat.toFixed(4)}, {currentCoords.lng.toFixed(4)}
+                </div>
+              )}
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <Button asChild variant="outline" size="sm" className="uppercase font-mono">
               <Link href="/technician/bookings">{t("tech_view_jobs")}</Link>
             </Button>
@@ -37,6 +174,51 @@ export default function TechnicianDashboard() {
           </div>
         </div>
 
+        {/* Availability selector */}
+        <div className="border border-border bg-card rounded-lg p-5 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold uppercase font-mono text-sm">AVAILABILITY</h2>
+            {isTracking ? (
+              <button
+                onClick={stopTracking}
+                className="flex items-center gap-1.5 text-xs font-mono border border-primary/40 text-primary px-3 py-1.5 rounded hover:bg-primary/10 transition-colors"
+              >
+                <Navigation className="w-3 h-3 animate-pulse" />
+                GPS ON — STOP
+              </button>
+            ) : (
+              <button
+                onClick={startTracking}
+                className="flex items-center gap-1.5 text-xs font-mono border border-border text-muted-foreground px-3 py-1.5 rounded hover:border-primary/40 hover:text-primary transition-colors"
+              >
+                <Navigation className="w-3 h-3" />
+                ENABLE GPS
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+            {(Object.entries(STATUS_CONFIG) as [TechnicianStatus, typeof STATUS_CONFIG[string]][]).map(([status, cfg]) => (
+              <button
+                key={status}
+                onClick={() => handleStatusChange(status as TechnicianStatus)}
+                disabled={updateStatus.isPending || currentStatus === status}
+                className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border text-center transition-all ${
+                  currentStatus === status
+                    ? `border-current bg-current/10 ${cfg.color}`
+                    : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                }`}
+              >
+                {cfg.icon}
+                <span className={`text-xs font-mono font-bold leading-tight ${currentStatus === status ? cfg.color : ""}`}>
+                  {cfg.label}
+                </span>
+              </button>
+            ))}
+          </div>
+          <p className="text-xs font-mono text-muted-foreground mt-3">{statusCfg.description}</p>
+        </div>
+
+        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           {[
             { label: t("tech_completed"), value: dashboard?.completedJobs ?? 0,      icon: <CheckCircle className="w-5 h-5" />, color: "text-emerald-400" },
@@ -102,7 +284,19 @@ export default function TechnicianDashboard() {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground font-mono">{job.issueDescription?.slice(0, 80)}</p>
-                  <p className="text-xs text-muted-foreground font-mono mt-1">{job.address}</p>
+                  {job.address && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <p className="text-xs text-muted-foreground font-mono flex-1">{job.address}</p>
+                      <a
+                        href={`https://maps.google.com/?q=${encodeURIComponent(job.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-xs font-mono text-primary border border-primary/30 px-2 py-0.5 rounded hover:bg-primary/10 transition-colors"
+                      >
+                        <Navigation className="w-3 h-3" /> NAV
+                      </a>
+                    </div>
+                  )}
                 </div>
               )) : (
                 <div className="p-8 text-center">

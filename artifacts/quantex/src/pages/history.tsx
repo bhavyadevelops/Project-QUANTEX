@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
-import { useListBookings, useUpdateBookingStatus, ListBookingsStatus, BookingStatusUpdateStatus } from "@workspace/api-client-react";
+import { useListBookings, useUpdateBookingStatus, ListBookingsStatus, BookingStatus } from "@workspace/api-client-react";
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,7 +41,7 @@ export default function History() {
 
   const handleCancel = async (id: number) => {
     try {
-      await updateStatus.mutateAsync({ id, data: { status: BookingStatusUpdateStatus.cancelled } });
+      await updateStatus.mutateAsync({ id, data: { status: BookingStatus.cancelled } });
       toast({ title: t("cancel_success"), description: t("cancel_success_desc") });
       refetch();
     } catch (err: any) {

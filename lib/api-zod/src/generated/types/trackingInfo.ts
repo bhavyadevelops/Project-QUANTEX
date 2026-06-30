@@ -10,8 +10,12 @@ export interface TrackingInfo {
   bookingId: number;
   status: string;
   etaMinutes: number;
-  technicianLat: number;
-  technicianLng: number;
+  /** @nullable */
+  technicianLat?: number | null;
+  /** @nullable */
+  technicianLng?: number | null;
+  /** @nullable */
+  distanceKm?: number | null;
   progress: number;
-  lastUpdated?: string;
+  lastUpdated: string;
 }

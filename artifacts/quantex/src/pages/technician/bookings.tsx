@@ -1,15 +1,22 @@
 import React, { useState } from "react";
 import {
-  useListBookings, useUpdateBookingStatus, useGetTechnicianBrief,
-  BookingStatusUpdateStatus, ListBookingsStatus,
+  useListBookings, useUpdateBookingStatus, useGetTechnicianBrief, useGetMyTechnicianProfile,
+  BookingStatus, ListBookingsStatus,
 } from "@workspace/api-client-react";
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useRealtimeEvents } from "@/hooks/use-realtime-events";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Loader2, CheckCircle, XCircle, Zap, Clock, MapPin, User, Plus,
-  Sparkles, ChevronDown, ChevronUp, Wrench, ShieldAlert, Package,
+  Sparkles, ChevronDown, ChevronUp, Wrench, ShieldAlert, Package, Navigation,
+  Car, AlertTriangle, Coffee,
 } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const DIFFICULTY_COLOR: Record<string, string> = {
   Easy:     "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
@@ -68,14 +75,12 @@ function AIBriefPanel({ jobId, issueDescription, categoryName, customerName, add
 
       {open && !loading && brief && (
         <div className="p-4 space-y-3 bg-card/50 border-t border-primary/20">
-          {/* Summary */}
           <div>
             <p className="text-xs font-mono text-primary uppercase mb-1 font-bold">{t("tech_ai_summary")}</p>
             <p className="text-xs font-mono text-muted-foreground leading-relaxed">{brief.issueSummary}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Difficulty + Duration */}
             <div className="space-y-2">
               {brief.difficultyLevel && (
                 <div>
@@ -91,7 +96,6 @@ function AIBriefPanel({ jobId, issueDescription, categoryName, customerName, add
               </div>
             </div>
 
-            {/* Tools */}
             {brief.toolsNeeded?.length > 0 && (
               <div>
                 <p className="text-xs font-mono text-muted-foreground uppercase mb-1 flex items-center gap-1">
@@ -108,7 +112,6 @@ function AIBriefPanel({ jobId, issueDescription, categoryName, customerName, add
             )}
           </div>
 
-          {/* Suggested Parts */}
           {brief.suggestedParts?.length > 0 && (
             <div>
               <p className="text-xs font-mono text-muted-foreground uppercase mb-1 flex items-center gap-1">
@@ -122,7 +125,6 @@ function AIBriefPanel({ jobId, issueDescription, categoryName, customerName, add
             </div>
           )}
 
-          {/* Safety */}
           {brief.safetyRecommendations?.length > 0 && (
             <div className="border border-yellow-400/30 bg-yellow-400/5 p-3 rounded">
               <p className="text-xs font-mono text-yellow-400 uppercase mb-1 font-bold flex items-center gap-1">
@@ -136,7 +138,6 @@ function AIBriefPanel({ jobId, issueDescription, categoryName, customerName, add
             </div>
           )}
 
-          {/* Customer Tips */}
           {brief.customerTips && (
             <div className="border border-blue-400/20 bg-blue-400/5 p-3 rounded">
               <p className="text-xs font-mono text-blue-400 uppercase mb-1 font-bold">{t("tech_ai_tips")}</p>
@@ -160,28 +161,64 @@ export default function TechnicianBookings() {
   const [filter, setFilter] = useState<string>("");
   const { toast } = useToast();
   const { t } = useLanguage();
+  const queryClient = useQueryClient();
+
+  const { data: profile } = useGetMyTechnicianProfile({ query: {} as any });
 
   const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-    pending:     { label: t("st_pending"),     color: "text-yellow-400 border-yellow-400/30 bg-yellow-400/10", icon: <Clock className="w-3 h-3" /> },
-    accepted:    { label: t("st_accepted"),    color: "text-blue-400 border-blue-400/30 bg-blue-400/10",       icon: <CheckCircle className="w-3 h-3" /> },
-    in_progress: { label: t("st_in_progress"), color: "text-primary border-primary/30 bg-primary/10",          icon: <Zap className="w-3 h-3" /> },
-    completed:   { label: t("st_completed"),   color: "text-emerald-400 border-emerald-400/30 bg-emerald-400/10", icon: <CheckCircle className="w-3 h-3" /> },
-    cancelled:   { label: t("st_cancelled"),   color: "text-red-400 border-red-400/30 bg-red-400/10",          icon: <XCircle className="w-3 h-3" /> },
+    searching:        { label: "SEARCHING",       color: "text-blue-300 border-blue-300/30 bg-blue-300/10",     icon: <Clock className="w-3 h-3" /> },
+    assigned:         { label: "ASSIGNED",         color: "text-blue-400 border-blue-400/30 bg-blue-400/10",    icon: <CheckCircle className="w-3 h-3" /> },
+    pending:          { label: "PENDING",          color: "text-yellow-400 border-yellow-400/30 bg-yellow-400/10", icon: <Clock className="w-3 h-3" /> },
+    accepted:         { label: "ACCEPTED",         color: "text-blue-400 border-blue-400/30 bg-blue-400/10",    icon: <CheckCircle className="w-3 h-3" /> },
+    travelling:       { label: "TRAVELLING",       color: "text-cyan-400 border-cyan-400/30 bg-cyan-400/10",    icon: <Car className="w-3 h-3" /> },
+    arriving:         { label: "ARRIVING",         color: "text-cyan-300 border-cyan-300/30 bg-cyan-300/10",    icon: <Navigation className="w-3 h-3" /> },
+    reached:          { label: "REACHED",          color: "text-emerald-300 border-emerald-300/30 bg-emerald-300/10", icon: <MapPin className="w-3 h-3" /> },
+    in_progress:      { label: "IN PROGRESS",      color: "text-primary border-primary/30 bg-primary/10",      icon: <Zap className="w-3 h-3" /> },
+    waiting_for_parts:{ label: "WAITING PARTS",   color: "text-orange-400 border-orange-400/30 bg-orange-400/10", icon: <Coffee className="w-3 h-3" /> },
+    completed:        { label: "COMPLETED",        color: "text-emerald-400 border-emerald-400/30 bg-emerald-400/10", icon: <CheckCircle className="w-3 h-3" /> },
+    payment_completed:{ label: "PAID",            color: "text-emerald-500 border-emerald-500/30 bg-emerald-500/10", icon: <CheckCircle className="w-3 h-3" /> },
+    cancelled:        { label: "CANCELLED",       color: "text-red-400 border-red-400/30 bg-red-400/10",       icon: <XCircle className="w-3 h-3" /> },
   };
 
   const FILTER_OPTIONS = [
     { label: t("hist_all"),       value: "" },
-    { label: t("hist_pending"),   value: ListBookingsStatus.pending },
-    { label: t("hist_accepted"),  value: ListBookingsStatus.accepted },
-    { label: t("hist_inprog"),    value: ListBookingsStatus.in_progress },
-    { label: t("hist_completed"), value: ListBookingsStatus.completed },
-    { label: t("hist_cancelled"), value: ListBookingsStatus.cancelled },
+    { label: "PENDING",   value: ListBookingsStatus.pending },
+    { label: "ACCEPTED",  value: ListBookingsStatus.accepted },
+    { label: "IN PROGRESS", value: ListBookingsStatus.in_progress },
+    { label: "COMPLETED", value: ListBookingsStatus.completed },
+    { label: "CANCELLED", value: ListBookingsStatus.cancelled },
   ] as const;
 
-  const NEXT_STATUS: Record<string, { label: string; next: BookingStatusUpdateStatus }> = {
-    pending:     { label: t("tech_b_accept"),   next: BookingStatusUpdateStatus.accepted },
-    accepted:    { label: t("tech_b_start"),    next: BookingStatusUpdateStatus.in_progress },
-    in_progress: { label: t("tech_b_complete"), next: BookingStatusUpdateStatus.completed },
+  // Full next-step state machine for technicians
+  // confirmRequired means a confirm dialog must be shown before the action fires
+  const NEXT_STATUS: Record<string, { label: string; next: BookingStatus; confirmRequired: boolean; confirmTitle: string; confirmDesc: string; danger?: boolean }[]> = {
+    pending: [
+      { label: "ACCEPT JOB", next: BookingStatus.accepted, confirmRequired: true, confirmTitle: "ACCEPT JOB?", confirmDesc: "You will be marked busy and assigned to this customer. You cannot accept another job until this one is completed." },
+      { label: "DECLINE", next: BookingStatus.cancelled, confirmRequired: true, confirmTitle: "DECLINE JOB?", confirmDesc: "This will cancel the booking. The customer will be notified.", danger: true },
+    ],
+    accepted: [
+      { label: "START TRAVEL", next: BookingStatus.travelling, confirmRequired: true, confirmTitle: "START TRAVEL?", confirmDesc: "Confirm you are now heading to the customer's location." },
+    ],
+    travelling: [
+      { label: "MARK ARRIVING", next: BookingStatus.arriving, confirmRequired: true, confirmTitle: "MARK ARRIVING?", confirmDesc: "Confirm you are close to the customer's location." },
+    ],
+    arriving: [
+      { label: "I'VE ARRIVED", next: BookingStatus.reached, confirmRequired: true, confirmTitle: "CONFIRM ARRIVAL?", confirmDesc: "Confirm you have arrived at the customer's location." },
+    ],
+    reached: [
+      { label: "START WORK", next: BookingStatus.in_progress, confirmRequired: true, confirmTitle: "START WORK?", confirmDesc: "Confirm you are beginning work on the customer's issue." },
+    ],
+    in_progress: [
+      { label: "NEED PARTS", next: BookingStatus.waiting_for_parts, confirmRequired: true, confirmTitle: "PAUSE FOR PARTS?", confirmDesc: "This will mark the job as waiting for parts. Resume when you have them." },
+      { label: "COMPLETE JOB", next: BookingStatus.completed, confirmRequired: true, confirmTitle: "COMPLETE JOB?", confirmDesc: "Mark the job as completed. The customer will be notified and payment will be processed." },
+    ],
+    waiting_for_parts: [
+      { label: "RESUME WORK", next: BookingStatus.in_progress, confirmRequired: true, confirmTitle: "RESUME WORK?", confirmDesc: "Confirm you have the parts and are resuming work." },
+      { label: "COMPLETE JOB", next: BookingStatus.completed, confirmRequired: true, confirmTitle: "COMPLETE JOB?", confirmDesc: "Mark the job as completed. The customer will be notified and payment will be processed." },
+    ],
+    completed: [
+      { label: "CONFIRM PAYMENT", next: BookingStatus.payment_completed, confirmRequired: true, confirmTitle: "CONFIRM PAYMENT?", confirmDesc: "Confirm that payment has been collected from the customer." },
+    ],
   };
 
   const { data: bookings, isLoading, refetch } = useListBookings(
@@ -189,17 +226,26 @@ export default function TechnicianBookings() {
   );
   const updateStatus = useUpdateBookingStatus();
 
-  const handleStatusUpdate = async (id: number, status: BookingStatusUpdateStatus) => {
+  // SSE: auto-refresh booking list on events
+  useRealtimeEvents({
+    technicianId: profile?.id,
+    enabled: !!profile?.id,
+    onEvent: () => {
+      queryClient.invalidateQueries({ queryKey: ["listBookings"] });
+    },
+  });
+
+  const handleStatusUpdate = async (id: number, status: BookingStatus) => {
     try {
       await updateStatus.mutateAsync({ id, data: { status } });
-      toast({ title: "Status Updated", description: `Job marked as ${status.replace("_", " ")}.` });
+      toast({ title: "STATUS UPDATED", description: `Job marked as ${status.replace(/_/g, " ")}.` });
       refetch();
     } catch (err: any) {
       toast({ title: "Update Failed", description: err.message ?? "Try again.", variant: "destructive" });
     }
   };
 
-  const AI_BRIEF_STATUSES = new Set(["pending", "accepted", "in_progress"]);
+  const AI_BRIEF_STATUSES = new Set(["pending", "accepted", "travelling", "arriving", "reached", "in_progress", "waiting_for_parts"]);
 
   return (
     <div className="min-h-screen bg-background py-10">
@@ -228,9 +274,10 @@ export default function TechnicianBookings() {
         ) : bookings && bookings.length > 0 ? (
           <div className="space-y-4">
             {bookings.map((job) => {
-              const cfg = STATUS_CONFIG[job.status ?? "pending"] ?? STATUS_CONFIG.pending;
-              const nextAction = job.status ? NEXT_STATUS[job.status] : null;
+              const cfg = STATUS_CONFIG[job.status ?? "pending"] ?? STATUS_CONFIG.pending!;
+              const nextActions = job.status ? NEXT_STATUS[job.status] : null;
               const showAiBrief = AI_BRIEF_STATUSES.has(job.status ?? "");
+
               return (
                 <div key={job.id} className="border border-border bg-card p-5 rounded-lg hover:border-primary/40 transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
@@ -246,6 +293,7 @@ export default function TechnicianBookings() {
                       <p className="text-xs text-muted-foreground font-mono">{job.scheduledAt ? new Date(job.scheduledAt).toLocaleDateString() : "ASAP"}</p>
                     </div>
                   </div>
+
                   <div className="flex flex-wrap gap-4 text-xs font-mono text-muted-foreground mb-4">
                     {job.customerName && <span className="flex items-center gap-1"><User className="w-3 h-3" /> {job.customerName}</span>}
                     {job.address && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {job.address}</span>}
@@ -256,18 +304,56 @@ export default function TechnicianBookings() {
                     )}
                   </div>
 
-                  {nextAction && (
-                    <div className="flex gap-2 mb-1">
-                      <Button size="sm" className="uppercase font-mono text-xs" onClick={() => handleStatusUpdate(job.id, nextAction.next)} disabled={updateStatus.isPending}>
-                        {updateStatus.isPending ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <CheckCircle className="w-3 h-3 mr-1" />}
-                        {nextAction.label}
-                      </Button>
-                      {job.status === "pending" && (
-                        <Button size="sm" variant="outline" className="uppercase font-mono text-xs text-red-400 border-red-400/30 hover:bg-red-400/10"
-                          onClick={() => handleStatusUpdate(job.id, BookingStatusUpdateStatus.cancelled)}>
-                          <XCircle className="w-3 h-3 mr-1" /> {t("tech_b_decline")}
-                        </Button>
-                      )}
+                  {/* Navigate button for accepted/travelling/arriving/reached */}
+                  {job.address && ["accepted", "travelling", "arriving", "reached"].includes(job.status ?? "") && (
+                    <div className="mb-4">
+                      <a
+                        href={`https://maps.google.com/?q=${encodeURIComponent(job.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-mono border border-primary/40 text-primary px-3 py-1.5 rounded hover:bg-primary/10 transition-colors"
+                      >
+                        <Navigation className="w-3 h-3" /> NAVIGATE TO CUSTOMER
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Action buttons — all transitions require confirmation */}
+                  {nextActions && nextActions.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-1">
+                      {nextActions.map((action) => (
+                        <AlertDialog key={action.next}>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant={action.danger ? "outline" : "default"}
+                              className={`uppercase font-mono text-xs ${action.danger ? "text-red-400 border-red-400/30 hover:bg-red-400/10" : ""}`}
+                              disabled={updateStatus.isPending}
+                            >
+                              {action.danger
+                                ? <XCircle className="w-3 h-3 mr-1" />
+                                : <CheckCircle className="w-3 h-3 mr-1" />}
+                              {action.label}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="font-mono uppercase">{action.confirmTitle}</AlertDialogTitle>
+                              <AlertDialogDescription className="font-mono text-sm">{action.confirmDesc}</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="font-mono uppercase text-xs">CANCEL</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleStatusUpdate(job.id, action.next)}
+                                className={`font-mono uppercase text-xs ${action.danger ? "bg-red-500 hover:bg-red-600 text-white" : ""}`}
+                              >
+                                {updateStatus.isPending ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
+                                CONFIRM
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      ))}
                     </div>
                   )}
 

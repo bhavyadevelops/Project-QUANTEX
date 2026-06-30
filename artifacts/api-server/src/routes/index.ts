@@ -9,6 +9,7 @@ import reviewsRouter from "./reviews";
 import dashboardRouter from "./dashboard";
 import aiRouter from "./ai";
 import analyticsRouter from "./analytics";
+import eventsRouter from "./events";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(reviewsRouter);
 router.use(dashboardRouter);
 router.use(aiRouter);
 router.use(analyticsRouter);
+router.use(eventsRouter);
 
 export default router;

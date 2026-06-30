@@ -51,10 +51,12 @@ export const techniciansTable = pgTable("technicians", {
   // Location
   latitude: real("latitude"),
   longitude: real("longitude"),
+  lastLocationAt: timestamp("last_location_at", { withTimezone: true }),
   serviceCity: text("service_city"),
   pinCode: text("pin_code"),
   // Status & badges
   currentStatus: technicianStatusEnum("current_status").notNull().default("offline"),
+  statusBeforeJob: technicianStatusEnum("status_before_job"),
   verificationBadges: jsonb("verification_badges").$type<string[]>().notNull().default([]),
   // Personal (owner-only fields — never exposed on public list/detail endpoints)
   gender: text("gender"),

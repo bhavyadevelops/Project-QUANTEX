@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
-import { eq, and, gte, lte, ilike, or, desc, asc, sql } from "drizzle-orm";
-import { db, techniciansTable, usersTable, reviewsTable } from "@workspace/db";
+import { eq, and, gte, lte, ilike, or, desc, asc, sql, inArray } from "drizzle-orm";
+import { db, techniciansTable, usersTable, reviewsTable, bookingsTable } from "@workspace/db";
 import {
   ListTechniciansQueryParams,
   CreateTechnicianProfileBody,
@@ -9,8 +9,12 @@ import {
   UpdateTechnicianBody,
 } from "@workspace/api-zod";
 import { getAuthUser } from "./auth";
+import { eventBus } from "../lib/events";
 
 const router: IRouter = Router();
+
+// Statuses that count as "active" for booking lock
+const ACTIVE_BOOKING_STATUSES = ["accepted", "travelling", "arriving", "reached", "in_progress", "waiting_for_parts"];
 
 /**
  * Fields safe to expose on public list/detail endpoints.
@@ -32,6 +36,7 @@ function publicTechRow(t: typeof techniciansTable.$inferSelect) {
     responseTime: t.responseTime,
     latitude: t.latitude,
     longitude: t.longitude,
+    lastLocationAt: t.lastLocationAt?.toISOString() ?? null,
     currentStatus: t.currentStatus,
     verificationBadges: t.verificationBadges,
     categoryIds: t.categoryIds,
@@ -88,9 +93,12 @@ router.get("/technicians", async (req, res): Promise<void> => {
     conditions.push(eq(techniciansTable.isAvailable, availFilter));
   }
 
-  // Status filter
+  // Status filter — default to online+emergency_only when no explicit status requested
+  // This ensures offline/busy/on_break technicians are hidden from the marketplace by default
   if (q.currentStatus) {
     conditions.push(eq(techniciansTable.currentStatus, q.currentStatus as any));
+  } else {
+    conditions.push(sql`${techniciansTable.currentStatus} IN ('online', 'emergency_only')` as any);
   }
 
   // Rating filter
@@ -394,6 +402,170 @@ router.patch("/technicians/:id", async (req, res): Promise<void> => {
   }
 
   // Owner-scoped response includes sensitive personal fields
+  res.json({ ...privateTechRow(technician), name: user.name, distance: null });
+});
+
+const VALID_TECH_STATUSES = new Set(["online", "offline", "busy", "on_break", "emergency_only"]);
+
+// PATCH /technicians/:id/location — update GPS coordinates
+router.patch("/technicians/:id/location", async (req, res): Promise<void> => {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  const user = await getAuthUser(token);
+  if (!user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid technician ID" });
+    return;
+  }
+
+  const [existing] = await db
+    .select({ userId: techniciansTable.userId })
+    .from(techniciansTable)
+    .where(eq(techniciansTable.id, id));
+
+  if (!existing) {
+    res.status(404).json({ error: "Technician not found" });
+    return;
+  }
+
+  if (existing.userId !== user.id) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
+
+  const { latitude, longitude } = req.body ?? {};
+  if (typeof latitude !== "number" || typeof longitude !== "number" ||
+      latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+    res.status(400).json({ error: "latitude (-90..90) and longitude (-180..180) are required numbers" });
+    return;
+  }
+
+  const now = new Date();
+  const [technician] = await db
+    .update(techniciansTable)
+    .set({ latitude, longitude, lastLocationAt: now })
+    .where(eq(techniciansTable.id, id))
+    .returning();
+
+  if (!technician) {
+    res.status(404).json({ error: "Technician not found" });
+    return;
+  }
+
+  // Recompute ETA for any active booking this technician has
+  const ACTIVE_STATUSES = ["accepted", "travelling", "arriving", "reached", "in_progress", "waiting_for_parts"];
+  const [activeBooking] = await db
+    .select({ id: bookingsTable.id, destLatitude: bookingsTable.destLatitude, destLongitude: bookingsTable.destLongitude })
+    .from(bookingsTable)
+    .where(and(
+      eq(bookingsTable.technicianId, id),
+      inArray(bookingsTable.status, ACTIVE_STATUSES as any[])
+    ))
+    .limit(1);
+
+  let etaMinutes: number | null = null;
+  let distanceKm: number | null = null;
+
+  if (activeBooking?.destLatitude != null && activeBooking?.destLongitude != null) {
+    const dLat = (activeBooking.destLatitude - latitude) * Math.PI / 180;
+    const dLng = (activeBooking.destLongitude - longitude) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2
+      + Math.cos(latitude * Math.PI / 180) * Math.cos(activeBooking.destLatitude * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+    const straightLine = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    distanceKm = Math.round(straightLine * 1.4 * 10) / 10;
+    etaMinutes = Math.max(1, Math.round((distanceKm / 30) * 60));
+  }
+
+  eventBus.publish("technician_location_updated", {
+    technicianId: id,
+    latitude,
+    longitude,
+    etaMinutes,
+    distanceKm,
+    lastLocationAt: now.toISOString(),
+  });
+
+  res.json({ ...privateTechRow(technician), name: user.name, distance: null });
+});
+
+// PATCH /technicians/:id/status — update availability status
+router.patch("/technicians/:id/status", async (req, res): Promise<void> => {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  const user = await getAuthUser(token);
+  if (!user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid technician ID" });
+    return;
+  }
+
+  const [existing] = await db
+    .select({ userId: techniciansTable.userId, currentStatus: techniciansTable.currentStatus })
+    .from(techniciansTable)
+    .where(eq(techniciansTable.id, id));
+
+  if (!existing) {
+    res.status(404).json({ error: "Technician not found" });
+    return;
+  }
+
+  if (existing.userId !== user.id) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
+
+  const { currentStatus: newStatus } = req.body ?? {};
+  if (!newStatus || !VALID_TECH_STATUSES.has(newStatus)) {
+    res.status(400).json({ error: `currentStatus must be one of: ${[...VALID_TECH_STATUSES].join(", ")}` });
+    return;
+  }
+
+  // Booking lock: if technician has an active booking, block manual status changes
+  if (existing.currentStatus === "busy") {
+    const activeBookings = await db
+      .select({ id: bookingsTable.id })
+      .from(bookingsTable)
+      .where(
+        and(
+          eq(bookingsTable.technicianId, id),
+          inArray(bookingsTable.status, ACTIVE_BOOKING_STATUSES as any[])
+        )
+      )
+      .limit(1);
+
+    if (activeBookings.length > 0) {
+      res.status(400).json({
+        error: "Cannot change status while an active booking is in progress. Complete or cancel the booking first.",
+      });
+      return;
+    }
+  }
+
+  const [technician] = await db
+    .update(techniciansTable)
+    .set({ currentStatus: newStatus })
+    .where(eq(techniciansTable.id, id))
+    .returning();
+
+  if (!technician) {
+    res.status(404).json({ error: "Technician not found" });
+    return;
+  }
+
+  // Emit status changed event
+  eventBus.publish("technician_status_changed", {
+    technicianId: id,
+    currentStatus: newStatus,
+  });
+
   res.json({ ...privateTechRow(technician), name: user.name, distance: null });
 });
 

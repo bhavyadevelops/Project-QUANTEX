@@ -5,10 +5,8 @@
  * QUANTEX API - AI-powered technician booking platform
  * OpenAPI spec version: 0.1.0
  */
-import type { BookingStatus } from './bookingStatus';
+import type { TechnicianStatus } from './technicianStatus';
 
-export interface BookingStatusUpdate {
-  status: BookingStatus;
-  notes?: string;
-  finalCost?: number;
+export interface TechnicianStatusUpdate {
+  currentStatus: TechnicianStatus;
 }

@@ -178,6 +178,7 @@ export const ListTechniciansResponseItem = zod.object({
   "distance": zod.number().nullish(),
   "latitude": zod.number().nullish(),
   "longitude": zod.number().nullish(),
+  "lastLocationAt": zod.string().nullish(),
   "currentStatus": zod.enum(['online', 'offline', 'busy', 'on_break', 'emergency_only']).optional(),
   "verificationBadges": zod.array(zod.string()).optional(),
   "categoryIds": zod.array(zod.number()).optional(),
@@ -270,6 +271,7 @@ export const GetMyTechnicianProfileResponse = zod.object({
   "distance": zod.number().nullish(),
   "latitude": zod.number().nullish(),
   "longitude": zod.number().nullish(),
+  "lastLocationAt": zod.string().nullish(),
   "currentStatus": zod.enum(['online', 'offline', 'busy', 'on_break', 'emergency_only']).optional(),
   "verificationBadges": zod.array(zod.string()).optional(),
   "categoryIds": zod.array(zod.number()).optional(),
@@ -324,6 +326,7 @@ export const GetTechnicianResponse = zod.object({
   "distance": zod.number().nullish(),
   "latitude": zod.number().nullish(),
   "longitude": zod.number().nullish(),
+  "lastLocationAt": zod.string().nullish(),
   "currentStatus": zod.enum(['online', 'offline', 'busy', 'on_break', 'emergency_only']).optional(),
   "verificationBadges": zod.array(zod.string()).optional(),
   "categoryIds": zod.array(zod.number()).optional(),
@@ -417,6 +420,126 @@ export const UpdateTechnicianResponse = zod.object({
   "distance": zod.number().nullish(),
   "latitude": zod.number().nullish(),
   "longitude": zod.number().nullish(),
+  "lastLocationAt": zod.string().nullish(),
+  "currentStatus": zod.enum(['online', 'offline', 'busy', 'on_break', 'emergency_only']).optional(),
+  "verificationBadges": zod.array(zod.string()).optional(),
+  "categoryIds": zod.array(zod.number()).optional(),
+  "profession": zod.array(zod.string()).optional(),
+  "servicesOffered": zod.record(zod.string(), zod.array(zod.string())).optional(),
+  "yearsExperience": zod.number().nullish(),
+  "certifications": zod.array(zod.string()).optional(),
+  "previousCompany": zod.string().nullish(),
+  "areasOfExpertise": zod.array(zod.string()).optional(),
+  "languagesSpoken": zod.array(zod.string()).optional(),
+  "visitCharge": zod.number().nullish(),
+  "perJobRate": zod.number().nullish(),
+  "inspectionCharge": zod.number().nullish(),
+  "emergencyCharge": zod.number().nullish(),
+  "weekendCharge": zod.number().nullish(),
+  "nightCharge": zod.number().nullish(),
+  "workingDays": zod.array(zod.string()).optional(),
+  "workingHoursStart": zod.string().nullish(),
+  "workingHoursEnd": zod.string().nullish(),
+  "emergencyAvailable": zod.boolean().optional(),
+  "vacationMode": zod.boolean().optional(),
+  "maxDailyBookings": zod.number().nullish(),
+  "serviceRadius": zod.number().nullish(),
+  "serviceCity": zod.string().nullish(),
+  "pinCode": zod.string().nullish(),
+  "gender": zod.string().nullish(),
+  "dateOfBirth": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update technician GPS location
+ */
+export const UpdateTechnicianLocationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateTechnicianLocationBody = zod.object({
+  "latitude": zod.number(),
+  "longitude": zod.number()
+})
+
+export const UpdateTechnicianLocationResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "name": zod.string(),
+  "bio": zod.string().nullish(),
+  "avatarUrl": zod.string().nullish(),
+  "profilePictureUrl": zod.string().nullish(),
+  "skills": zod.array(zod.string()),
+  "rating": zod.number(),
+  "reviewCount": zod.number(),
+  "isAvailable": zod.boolean(),
+  "completedJobs": zod.number(),
+  "hourlyRate": zod.number(),
+  "responseTime": zod.string(),
+  "distance": zod.number().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "lastLocationAt": zod.string().nullish(),
+  "currentStatus": zod.enum(['online', 'offline', 'busy', 'on_break', 'emergency_only']).optional(),
+  "verificationBadges": zod.array(zod.string()).optional(),
+  "categoryIds": zod.array(zod.number()).optional(),
+  "profession": zod.array(zod.string()).optional(),
+  "servicesOffered": zod.record(zod.string(), zod.array(zod.string())).optional(),
+  "yearsExperience": zod.number().nullish(),
+  "certifications": zod.array(zod.string()).optional(),
+  "previousCompany": zod.string().nullish(),
+  "areasOfExpertise": zod.array(zod.string()).optional(),
+  "languagesSpoken": zod.array(zod.string()).optional(),
+  "visitCharge": zod.number().nullish(),
+  "perJobRate": zod.number().nullish(),
+  "inspectionCharge": zod.number().nullish(),
+  "emergencyCharge": zod.number().nullish(),
+  "weekendCharge": zod.number().nullish(),
+  "nightCharge": zod.number().nullish(),
+  "workingDays": zod.array(zod.string()).optional(),
+  "workingHoursStart": zod.string().nullish(),
+  "workingHoursEnd": zod.string().nullish(),
+  "emergencyAvailable": zod.boolean().optional(),
+  "vacationMode": zod.boolean().optional(),
+  "maxDailyBookings": zod.number().nullish(),
+  "serviceRadius": zod.number().nullish(),
+  "serviceCity": zod.string().nullish(),
+  "pinCode": zod.string().nullish(),
+  "gender": zod.string().nullish(),
+  "dateOfBirth": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update technician availability status
+ */
+export const UpdateTechnicianStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateTechnicianStatusBody = zod.object({
+  "currentStatus": zod.enum(['online', 'offline', 'busy', 'on_break', 'emergency_only'])
+})
+
+export const UpdateTechnicianStatusResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "name": zod.string(),
+  "bio": zod.string().nullish(),
+  "avatarUrl": zod.string().nullish(),
+  "profilePictureUrl": zod.string().nullish(),
+  "skills": zod.array(zod.string()),
+  "rating": zod.number(),
+  "reviewCount": zod.number(),
+  "isAvailable": zod.boolean(),
+  "completedJobs": zod.number(),
+  "hourlyRate": zod.number(),
+  "responseTime": zod.string(),
+  "distance": zod.number().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "lastLocationAt": zod.string().nullish(),
   "currentStatus": zod.enum(['online', 'offline', 'busy', 'on_break', 'emergency_only']).optional(),
   "verificationBadges": zod.array(zod.string()).optional(),
   "categoryIds": zod.array(zod.number()).optional(),
@@ -472,7 +595,7 @@ export const GetTechnicianReviewsResponse = zod.array(GetTechnicianReviewsRespon
  * @summary List bookings for current user
  */
 export const ListBookingsQueryParams = zod.object({
-  "status": zod.enum(['pending', 'accepted', 'in_progress', 'completed', 'cancelled']).optional(),
+  "status": zod.enum(['searching', 'assigned', 'pending', 'accepted', 'travelling', 'arriving', 'reached', 'in_progress', 'waiting_for_parts', 'completed', 'payment_completed', 'cancelled']).optional(),
   "role": zod.enum(['customer', 'technician']).optional()
 })
 
@@ -481,7 +604,7 @@ export const ListBookingsResponseItem = zod.object({
   "customerId": zod.number(),
   "technicianId": zod.number(),
   "categoryId": zod.number(),
-  "status": zod.enum(['pending', 'accepted', 'in_progress', 'completed', 'cancelled']),
+  "status": zod.enum(['searching', 'assigned', 'pending', 'accepted', 'travelling', 'arriving', 'reached', 'in_progress', 'waiting_for_parts', 'completed', 'payment_completed', 'cancelled']),
   "issueDescription": zod.string(),
   "address": zod.string().nullish(),
   "scheduledAt": zod.string(),
@@ -506,7 +629,9 @@ export const CreateBookingBody = zod.object({
   "address": zod.string().optional(),
   "scheduledAt": zod.string(),
   "estimatedCost": zod.number(),
-  "notes": zod.string().optional()
+  "notes": zod.string().optional(),
+  "destLatitude": zod.number().nullish(),
+  "destLongitude": zod.number().nullish()
 })
 
 
@@ -522,7 +647,7 @@ export const GetBookingResponse = zod.object({
   "customerId": zod.number(),
   "technicianId": zod.number(),
   "categoryId": zod.number(),
-  "status": zod.enum(['pending', 'accepted', 'in_progress', 'completed', 'cancelled']),
+  "status": zod.enum(['searching', 'assigned', 'pending', 'accepted', 'travelling', 'arriving', 'reached', 'in_progress', 'waiting_for_parts', 'completed', 'payment_completed', 'cancelled']),
   "issueDescription": zod.string(),
   "address": zod.string().nullish(),
   "scheduledAt": zod.string(),
@@ -544,7 +669,7 @@ export const UpdateBookingStatusParams = zod.object({
 })
 
 export const UpdateBookingStatusBody = zod.object({
-  "status": zod.enum(['accepted', 'in_progress', 'completed', 'cancelled']),
+  "status": zod.enum(['searching', 'assigned', 'pending', 'accepted', 'travelling', 'arriving', 'reached', 'in_progress', 'waiting_for_parts', 'completed', 'payment_completed', 'cancelled']),
   "notes": zod.string().optional(),
   "finalCost": zod.number().optional()
 })
@@ -554,7 +679,7 @@ export const UpdateBookingStatusResponse = zod.object({
   "customerId": zod.number(),
   "technicianId": zod.number(),
   "categoryId": zod.number(),
-  "status": zod.enum(['pending', 'accepted', 'in_progress', 'completed', 'cancelled']),
+  "status": zod.enum(['searching', 'assigned', 'pending', 'accepted', 'travelling', 'arriving', 'reached', 'in_progress', 'waiting_for_parts', 'completed', 'payment_completed', 'cancelled']),
   "issueDescription": zod.string(),
   "address": zod.string().nullish(),
   "scheduledAt": zod.string(),
@@ -579,10 +704,11 @@ export const GetBookingTrackingResponse = zod.object({
   "bookingId": zod.number(),
   "status": zod.string(),
   "etaMinutes": zod.number(),
-  "technicianLat": zod.number(),
-  "technicianLng": zod.number(),
+  "technicianLat": zod.number().nullish(),
+  "technicianLng": zod.number().nullish(),
+  "distanceKm": zod.number().nullish(),
   "progress": zod.number(),
-  "lastUpdated": zod.string().optional()
+  "lastUpdated": zod.string()
 })
 
 
@@ -637,7 +763,7 @@ export const GetCustomerDashboardResponse = zod.object({
   "customerId": zod.number(),
   "technicianId": zod.number(),
   "categoryId": zod.number(),
-  "status": zod.enum(['pending', 'accepted', 'in_progress', 'completed', 'cancelled']),
+  "status": zod.enum(['searching', 'assigned', 'pending', 'accepted', 'travelling', 'arriving', 'reached', 'in_progress', 'waiting_for_parts', 'completed', 'payment_completed', 'cancelled']),
   "issueDescription": zod.string(),
   "address": zod.string().nullish(),
   "scheduledAt": zod.string(),
@@ -668,7 +794,7 @@ export const GetTechnicianDashboardResponse = zod.object({
   "customerId": zod.number(),
   "technicianId": zod.number(),
   "categoryId": zod.number(),
-  "status": zod.enum(['pending', 'accepted', 'in_progress', 'completed', 'cancelled']),
+  "status": zod.enum(['searching', 'assigned', 'pending', 'accepted', 'travelling', 'arriving', 'reached', 'in_progress', 'waiting_for_parts', 'completed', 'payment_completed', 'cancelled']),
   "issueDescription": zod.string(),
   "address": zod.string().nullish(),
   "scheduledAt": zod.string(),
@@ -752,6 +878,16 @@ export const GetAnalyticsSummaryResponse = zod.object({
   "name": zod.string(),
   "count": zod.number()
 }))
+})
+
+
+/**
+ * Opens a persistent SSE stream. Clients receive booking_status_changed, technician_location_updated, and technician_status_changed events.
+ * @summary Subscribe to real-time server-sent events
+ */
+export const SubscribeToEventsQueryParams = zod.object({
+  "bookingId": zod.coerce.number().optional().describe('Subscribe to events for a specific booking'),
+  "technicianId": zod.coerce.number().optional().describe('Subscribe to events for a specific technician')
 })
 
 

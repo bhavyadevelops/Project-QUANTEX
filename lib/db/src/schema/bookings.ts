@@ -6,10 +6,17 @@ import { techniciansTable } from "./technicians";
 import { serviceCategoriesTable } from "./service_categories";
 
 export const bookingStatusEnum = pgEnum("booking_status", [
+  "searching",
+  "assigned",
   "pending",
   "accepted",
+  "travelling",
+  "arriving",
+  "reached",
   "in_progress",
+  "waiting_for_parts",
   "completed",
+  "payment_completed",
   "cancelled",
 ]);
 
@@ -25,6 +32,8 @@ export const bookingsTable = pgTable("bookings", {
   estimatedCost: real("estimated_cost").notNull().default(0),
   finalCost: real("final_cost"),
   notes: text("notes"),
+  destLatitude: real("dest_latitude"),
+  destLongitude: real("dest_longitude"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 }, (t) => [

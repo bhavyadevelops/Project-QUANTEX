@@ -31,6 +31,8 @@ export interface Technician {
   latitude?: number | null;
   /** @nullable */
   longitude?: number | null;
+  /** @nullable */
+  lastLocationAt?: string | null;
   currentStatus?: TechnicianStatus;
   verificationBadges?: string[];
   categoryIds?: number[];

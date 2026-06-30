@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useListTechnicians, useListServiceCategories, ListTechniciansSortBy } from "@workspace/api-client-react";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
+import { useRealtimeEvents } from "@/hooks/use-realtime-events";
 import { TechnicianCard } from "@/components/technician-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -258,6 +259,11 @@ export default function Marketplace() {
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [location, setLocation] = useState<LocationState>({ status: "idle" });
+
+  // Live-refresh: invalidate technician list when any technician changes availability.
+  // The hook already invalidates ['/api/technicians'] on technician_status_changed,
+  // which matches the URL-based query keys from Orval-generated hooks.
+  useRealtimeEvents({ enabled: !!user });
 
   // Fixed debounce: useEffect with cleanup cancels stale timers
   useEffect(() => {

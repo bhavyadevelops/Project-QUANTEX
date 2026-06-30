@@ -117,6 +117,8 @@ export interface Technician {
   latitude?: number | null;
   /** @nullable */
   longitude?: number | null;
+  /** @nullable */
+  lastLocationAt?: string | null;
   currentStatus?: TechnicianStatus;
   verificationBadges?: string[];
   categoryIds?: number[];
@@ -242,14 +244,30 @@ export interface TechnicianUpdate {
   dateOfBirth?: string;
 }
 
+export interface TechnicianLocationUpdate {
+  latitude: number;
+  longitude: number;
+}
+
+export interface TechnicianStatusUpdate {
+  currentStatus: TechnicianStatus;
+}
+
 export type BookingStatus = typeof BookingStatus[keyof typeof BookingStatus];
 
 
 export const BookingStatus = {
+  searching: 'searching',
+  assigned: 'assigned',
   pending: 'pending',
   accepted: 'accepted',
+  travelling: 'travelling',
+  arriving: 'arriving',
+  reached: 'reached',
   in_progress: 'in_progress',
+  waiting_for_parts: 'waiting_for_parts',
   completed: 'completed',
+  payment_completed: 'payment_completed',
   cancelled: 'cancelled',
 } as const;
 
@@ -285,20 +303,12 @@ export interface BookingInput {
   scheduledAt: string;
   estimatedCost: number;
   notes?: string;
+  destLatitude?: number | null;
+  destLongitude?: number | null;
 }
 
-export type BookingStatusUpdateStatus = typeof BookingStatusUpdateStatus[keyof typeof BookingStatusUpdateStatus];
-
-
-export const BookingStatusUpdateStatus = {
-  accepted: 'accepted',
-  in_progress: 'in_progress',
-  completed: 'completed',
-  cancelled: 'cancelled',
-} as const;
-
 export interface BookingStatusUpdate {
-  status: BookingStatusUpdateStatus;
+  status: BookingStatus;
   notes?: string;
   finalCost?: number;
 }
@@ -307,10 +317,14 @@ export interface TrackingInfo {
   bookingId: number;
   status: string;
   etaMinutes: number;
-  technicianLat: number;
-  technicianLng: number;
+  /** @nullable */
+  technicianLat?: number | null;
+  /** @nullable */
+  technicianLng?: number | null;
+  /** @nullable */
+  distanceKm?: number | null;
   progress: number;
-  lastUpdated?: string;
+  lastUpdated: string;
 }
 
 export interface Review {
@@ -521,10 +535,17 @@ export type ListBookingsStatus = typeof ListBookingsStatus[keyof typeof ListBook
 
 
 export const ListBookingsStatus = {
+  searching: 'searching',
+  assigned: 'assigned',
   pending: 'pending',
   accepted: 'accepted',
+  travelling: 'travelling',
+  arriving: 'arriving',
+  reached: 'reached',
   in_progress: 'in_progress',
+  waiting_for_parts: 'waiting_for_parts',
   completed: 'completed',
+  payment_completed: 'payment_completed',
   cancelled: 'cancelled',
 } as const;
 
@@ -538,5 +559,16 @@ export const ListBookingsRole = {
 
 export type ListReviewsParams = {
 limit?: number;
+};
+
+export type SubscribeToEventsParams = {
+/**
+ * Subscribe to events for a specific booking
+ */
+bookingId?: number;
+/**
+ * Subscribe to events for a specific technician
+ */
+technicianId?: number;
 };
 

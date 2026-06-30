@@ -14,4 +14,6 @@ export interface BookingInput {
   scheduledAt: string;
   estimatedCost: number;
   notes?: string;
+  destLatitude?: number | null;
+  destLongitude?: number | null;
 }
