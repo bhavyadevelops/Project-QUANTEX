@@ -46,6 +46,7 @@ export default function BookTechnician() {
   const [step, setStep] = useState<Step>("category");
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const [analyzeLoading, setAnalyzeLoading] = useState(false);
+  const [expandedTechId, setExpandedTechId] = useState<number | null>(null);
   const { toast } = useToast();
 
   const { data: categories, isLoading: catsLoading } = useListServiceCategories();
@@ -196,7 +197,7 @@ export default function BookTechnician() {
                           {scored.map(({ tech }, idx) => {
                             const isRecommended = tech.id === recommendedId && idx === 0;
                             return (
-                              <div key={tech.id}>
+                              <div key={tech.id} className="space-y-1">
                                 {isRecommended && (
                                   <div className="flex items-center gap-2 mb-1.5">
                                     <Sparkles className="w-3 h-3 text-primary" />
@@ -204,38 +205,65 @@ export default function BookTechnician() {
                                     <span className="text-xs font-mono text-muted-foreground">— Top rated · Fastest response · Most experienced</span>
                                   </div>
                                 )}
-                                <button type="button"
-                                  onClick={() => { field.onChange(tech.id); setStep("details"); }}
-                                  className={`w-full flex items-center gap-4 p-4 border rounded-lg text-left transition-all hover:border-primary/60 ${
-                                    field.value === tech.id
-                                      ? "border-primary bg-primary/10"
-                                      : isRecommended
-                                        ? "border-primary/50 bg-primary/5"
-                                        : "border-border bg-background hover:bg-muted/20"
-                                  }`}>
-                                  <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center flex-shrink-0">
-                                    <span className="text-primary font-bold font-mono">{tech.name?.charAt(0) ?? "T"}</span>
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2">
-                                      <p className="font-bold text-sm uppercase">{tech.name}</p>
-                                      {isRecommended && (
-                                        <span className="text-xs font-mono bg-primary text-primary-foreground px-1.5 py-0.5 rounded">AI ★</span>
-                                      )}
+                                <div className={`border rounded-lg transition-all ${
+                                  field.value === tech.id
+                                    ? "border-primary"
+                                    : isRecommended
+                                      ? "border-primary/50"
+                                      : "border-border hover:border-primary/40"
+                                }`}>
+                                  {/* Compact summary row */}
+                                  <div className={`flex items-center gap-4 p-4 rounded-lg cursor-pointer ${
+                                    field.value === tech.id ? "bg-primary/10" : isRecommended ? "bg-primary/5" : "bg-background hover:bg-muted/20"
+                                  }`}
+                                    onClick={() => { field.onChange(tech.id); setStep("details"); }}>
+                                    <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center flex-shrink-0">
+                                      <span className="text-primary font-bold font-mono">{tech.name?.charAt(0) ?? "T"}</span>
                                     </div>
-                                    <p className="text-xs text-muted-foreground font-mono">{tech.skills?.slice(0, 3).join(" · ")}</p>
-                                    <div className="flex items-center gap-3 mt-1">
-                                      <span className="text-xs font-mono text-primary flex items-center gap-1">
-                                        <Star className="w-3 h-3 fill-primary" /> {tech.rating?.toFixed(1)} ({tech.reviewCount})
-                                      </span>
-                                      <span className="text-xs font-mono text-muted-foreground">${tech.hourlyRate}/hr</span>
-                                      <span className="text-xs font-mono text-muted-foreground">~{tech.responseTime}</span>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <p className="font-bold text-sm uppercase">{tech.name}</p>
+                                        {isRecommended && (
+                                          <span className="text-xs font-mono bg-primary text-primary-foreground px-1.5 py-0.5 rounded">AI ★</span>
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-muted-foreground font-mono truncate">{tech.skills?.slice(0, 3).join(" · ")}</p>
+                                      <div className="flex items-center gap-3 mt-1">
+                                        <span className="text-xs font-mono text-primary flex items-center gap-1">
+                                          <Star className="w-3 h-3 fill-primary" /> {tech.rating?.toFixed(1)} ({tech.reviewCount})
+                                        </span>
+                                        <span className="text-xs font-mono text-muted-foreground">${tech.hourlyRate}/hr</span>
+                                        <span className="text-xs font-mono text-muted-foreground">~{tech.responseTime}</span>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                      <div className={`text-xs font-mono px-2 py-1 rounded ${tech.isAvailable ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                                        {tech.isAvailable ? "AVAIL" : "BUSY"}
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => { e.stopPropagation(); setExpandedTechId(expandedTechId === tech.id ? null : tech.id); }}
+                                        className="text-[10px] font-mono border border-border px-2 py-1 rounded hover:border-primary/60 hover:text-primary transition-colors"
+                                      >
+                                        {expandedTechId === tech.id ? "HIDE" : "PROFILE"}
+                                      </button>
                                     </div>
                                   </div>
-                                  <div className={`text-xs font-mono px-2 py-1 rounded ${tech.isAvailable ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
-                                    {tech.isAvailable ? "AVAIL" : "BUSY"}
-                                  </div>
-                                </button>
+                                  {/* Full profile detail — expanded on demand */}
+                                  {expandedTechId === tech.id && (
+                                    <div className="border-t border-border/40 p-4 space-y-3 bg-muted/10 rounded-b-lg">
+                                      <TechnicianProfileCard technician={tech as typeof tech & { name: string }} />
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        className="w-full uppercase font-bold font-mono"
+                                        onClick={() => { field.onChange(tech.id); setStep("details"); }}
+                                      >
+                                        Select {tech.name} →
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             );
                           })}

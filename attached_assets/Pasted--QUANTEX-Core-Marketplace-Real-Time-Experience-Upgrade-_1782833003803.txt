@@ -1,0 +1,446 @@
+# QUANTEX – Core Marketplace & Real-Time Experience Upgrade
+
+You are an expert full-stack engineer and product architect. Your task is to transform QUANTEX into a production-ready, real-time technician marketplace similar to Blinkit/Uber, while preserving all existing functionality. Do **not** remove or break any current features. Audit the existing codebase first, identify the root causes of the issues below, and then implement the necessary fixes and improvements.
+
+---
+
+# 1. Technician Registration & Database Persistence (Highest Priority)
+
+Currently, technicians appear to register successfully, but:
+
+* They do not appear in the database.
+* They cannot be searched.
+* Their profiles disappear after refresh.
+
+Tasks:
+
+* Audit the technician registration flow from frontend to backend.
+* Verify that the frontend correctly sends the request.
+* Verify backend API endpoints.
+* Verify database insertions.
+* Verify Row Level Security (if using Supabase).
+* Verify authentication permissions.
+* Verify database schema.
+* Ensure every successful registration permanently creates a technician profile.
+
+Each technician should have:
+
+* Personal Information
+* Services Offered
+* Skills
+* Experience
+* Availability
+* Verification Status
+* Rating
+* Profile Picture
+* Service Radius
+* Current Status (Online/Offline/Busy)
+* Current GPS Coordinates (when online)
+
+After successful registration:
+
+* Store technician information permanently.
+* Make them immediately searchable.
+* Make them visible in the Technician Dashboard.
+* Ensure data persists after page refresh.
+
+---
+
+# 2. Technician Discovery & Search
+
+There is currently no proper technician directory.
+
+Implement a searchable marketplace.
+
+Features:
+
+* Search by technician name
+* Search by profession
+* Search by service
+* Search by specialization
+* Search by keywords
+
+Filters:
+
+* Distance
+* Rating
+* Price
+* Availability
+* Verified Technicians
+* Emergency Service
+* Experience
+* Response Time
+
+Sorting:
+
+* Nearest First
+* Highest Rated
+* Lowest Price
+* Fastest Arrival
+* Most Experienced
+
+Each technician card should display:
+
+* Name
+* Profile Picture
+* Profession
+* Rating
+* Reviews
+* Distance
+* Estimated Arrival Time
+* Price
+* Verification Badge
+* Availability Status
+
+---
+
+# 3. Persistent Authentication
+
+Currently users are logged out every time the page refreshes.
+
+Implement persistent authentication.
+
+Requirements:
+
+* Maintain login sessions.
+* Automatically restore user sessions.
+* Refresh authentication tokens.
+* Redirect users directly to their dashboard if already authenticated.
+* Handle expired sessions gracefully.
+
+Users should never have to repeatedly log in after refreshing the browser.
+
+---
+
+# 4. Live GPS Tracking
+
+Implement real-time location tracking for technicians.
+
+When technicians go online:
+
+* Continuously obtain GPS coordinates (with user permission).
+* Update location in the backend at regular intervals.
+* Show technician movement in real time.
+
+Customers should be able to see:
+
+* Technician location
+* Technician movement
+* Remaining distance
+* Live ETA
+
+Technicians should also be able to view:
+
+* Customer location
+* Customer address
+* Navigation route
+
+---
+
+# 5. ETA Calculation
+
+Implement dynamic ETA calculation.
+
+Requirements:
+
+* Calculate travel time using routing services.
+* Update ETA automatically as technician moves.
+* Recalculate when route changes.
+* Display:
+
+  * Distance
+  * Estimated Arrival Time
+  * Current Travel Status
+
+---
+
+# 6. Customer Location System
+
+After booking is accepted:
+
+Technician should receive:
+
+* Customer Name
+* Exact Address
+* GPS Coordinates
+* Contact Number
+* Navigation Button
+* Live Route
+
+Navigation should open the preferred maps application.
+
+---
+
+# 7. Live Order Tracking
+
+Implement a Blinkit/Uber-style booking tracker.
+
+Booking lifecycle:
+
+Searching Technician
+
+↓
+
+Technician Assigned
+
+↓
+
+Technician Accepted
+
+↓
+
+Travelling
+
+↓
+
+Arriving
+
+↓
+
+Reached
+
+↓
+
+Work Started
+
+↓
+
+Waiting for Parts (if required)
+
+↓
+
+Work Completed
+
+↓
+
+Payment Completed
+
+↓
+
+Review Submitted
+
+Every status update should occur in real time without requiring a page refresh.
+
+---
+
+# 8. Technician Availability
+
+Implement technician presence management.
+
+Available states:
+
+* Online
+* Offline
+* Busy
+* On Break
+* Emergency Only
+
+Rules:
+
+* Only Online technicians can receive bookings.
+* Busy technicians should automatically disappear from available search results.
+* Status should update automatically.
+
+---
+
+# 9. Real-Time Synchronization
+
+Implement live synchronization across the platform.
+
+Whenever:
+
+* Technician accepts a booking
+* Technician rejects a booking
+* Technician changes availability
+* Technician updates location
+* Booking status changes
+
+All connected clients should receive updates instantly without manual refresh.
+
+---
+
+# 10. Booking Locking System
+
+Prevent double bookings.
+
+When a technician accepts a booking:
+
+* Lock technician.
+* Mark technician as Busy.
+* Reject incoming booking requests until current job finishes.
+* Unlock technician after completion.
+
+---
+
+# 11. Booking History
+
+Customer Dashboard should include:
+
+* Previous Jobs
+* Upcoming Jobs
+* Technician Details
+* Invoice
+* Payment
+* Warranty
+* Images (if uploaded)
+* AI Diagnosis Summary
+
+Technician Dashboard should include:
+
+* Jobs Completed
+* Active Jobs
+* Earnings
+* Reviews
+* Ratings
+* Customer History
+
+---
+
+# 12. Verification System
+
+Each technician profile should support verification badges.
+
+Possible badges:
+
+* Government ID Verified
+* Phone Verified
+* Email Verified
+* Background Checked
+* Experienced Professional
+* Certified Technician
+
+Display verification badges throughout the platform.
+
+---
+
+# 13. Reviews & Ratings
+
+After job completion:
+Customers should be able to:
+
+* Rate technician
+* Write review
+* Upload photos
+* Report issues
+
+Technicians should be able to:
+
+* View feedback
+* Respond to reviews
+
+Display:
+
+* Average Rating
+* Total Reviews
+* Completion Rate
+
+---
+
+# 14. Dashboard Improvements
+
+Customer Dashboard:
+
+* Upcoming bookings
+* Live tracking
+* Booking history
+* Saved addresses
+* Favourite technicians
+* AI diagnosis history
+* Payments
+* Invoices
+
+Technician Dashboard:
+
+* Active bookings
+* Earnings
+* Online status
+* Availability toggle
+* Navigation
+* Customer details
+* Upcoming jobs
+* Analytics
+* Ratings
+* Reviews
+
+---
+
+# 15. Database Audit
+
+Audit the complete database structure.
+
+Verify:
+
+* Missing tables
+* Missing relationships
+* Foreign keys
+* Constraints
+* Indexes
+* Authentication mapping
+* Storage
+* Security policies
+
+Fix every issue found.
+
+---
+
+# 16. Performance
+
+Optimize:
+
+* API calls
+* Database queries
+* Real-time subscriptions
+* Search performance
+* Location updates
+* Dashboard loading
+
+Prevent unnecessary re-renders and duplicate requests.
+
+---
+
+# 17. UI/UX Improvements
+
+Maintain the existing design language while making the experience feel premium.
+
+Improve:
+
+* Loading states
+* Empty states
+* Error handling
+* Success messages
+* Responsive layouts
+* Skeleton loaders
+* Animations
+* Accessibility
+* Mobile usability
+
+---
+
+# 18. Code Quality
+
+Before implementing changes:
+
+* Audit the entire codebase.
+* Identify all related bugs.
+* Explain root causes.
+* Remove dead code.
+* Refactor duplicated logic.
+* Follow best practices.
+* Ensure scalability and maintainability.
+
+---
+
+# Final Deliverables
+
+1. Fix every issue related to technician registration and database persistence.
+2. Ensure all technician profiles are permanently stored and searchable.
+3. Implement persistent authentication.
+4. Build a complete technician discovery system with search, filters, and sorting.
+5. Add live GPS tracking and ETA calculations.
+6. Implement real-time booking lifecycle updates.
+7. Add technician availability management.
+8. Implement booking history, reviews, and verification.
+9. Optimize the database and overall application performance.
+10. Preserve all existing functionality while improving reliability, scalability, security, and user experience.
+
+Before considering the task complete, thoroughly test every user flow (customer and technician) to ensure all features work correctly across page refreshes, new sessions, and concurrent users. Document any architectural changes made and explain why they were necessary.

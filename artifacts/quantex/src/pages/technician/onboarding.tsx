@@ -21,65 +21,64 @@ import {
   Wrench,
   DollarSign,
   Clock,
-  MapPin,
   Eye,
   Zap,
   PlusCircle,
   X,
 } from "lucide-react";
 
-const PROFESSIONS = [
+export const PROFESSIONS = [
+  "AC Technician",
+  "Refrigerator Repair",
+  "Washing Machine Repair",
+  "Microwave & Oven Repair",
+  "RO / Water Purifier Service",
+  "Laptop & PC Repair",
+  "Mobile Phone Repair",
+  "TV & Display Repair",
+  "CCTV & Security Systems",
+  "Networking & WiFi Setup",
+  "Smart Home Automation",
   "Electrician",
   "Plumber",
-  "HVAC Technician",
-  "Appliance Repair",
-  "Computer Technician",
-  "Network Engineer",
-  "Security Specialist",
-  "Solar Technician",
-  "General Handyman",
   "Carpenter",
   "Painter",
-  "Locksmith",
-  "Welder",
-  "Roofer",
-  "Flooring Specialist",
-  "Tiler",
-  "Window & Door Specialist",
+  "Pest Control Specialist",
   "Cleaning Specialist",
-  "Pest Control",
-  "Landscaper",
-  "Pool Technician",
-  "Elevator Technician",
-  "Fire Safety Technician",
-  "Smart Home Specialist",
+  "Locksmith",
+  "HVAC / Ducting",
+  "Tiling & Flooring",
+  "Solar Panel Service",
+  "Generator & Inverter",
+  "Glass & Aluminium Work",
+  "Custom / Other",
 ];
 
-const PROFESSION_SERVICES: Record<string, string[]> = {
-  "Electrician": ["Wiring & Rewiring", "Panel Upgrades", "Outlet Installation", "Lighting Installation", "EV Charger Install", "Generator Setup", "Electrical Inspection"],
-  "Plumber": ["Pipe Repair", "Leak Detection", "Water Heater Install", "Drain Cleaning", "Sewer Line Repair", "Fixture Installation", "Water Softener Install"],
-  "HVAC Technician": ["AC Installation", "AC Repair", "Furnace Service", "Duct Cleaning", "Thermostat Install", "Air Quality Testing", "Heat Pump Service"],
-  "Appliance Repair": ["Washer / Dryer Repair", "Refrigerator Repair", "Dishwasher Repair", "Oven / Range Repair", "Microwave Repair", "Freezer Repair"],
-  "Computer Technician": ["Hardware Repair", "OS Installation", "Virus Removal", "Data Recovery", "Laptop Screen Repair", "Memory Upgrade", "SSD Installation"],
-  "Network Engineer": ["WiFi Setup", "Router Config", "LAN Cabling", "Network Troubleshooting", "VPN Setup", "Firewall Config", "Home Office Setup"],
-  "Security Specialist": ["CCTV Installation", "Alarm System Setup", "Access Control", "Smart Lock Install", "Security Audit", "Intercom Install"],
-  "Solar Technician": ["Solar Panel Install", "Inverter Setup", "Battery Storage", "Solar Audit", "System Monitoring", "Panel Cleaning"],
-  "General Handyman": ["Furniture Assembly", "TV Mounting", "Curtain Installation", "Minor Plumbing", "Minor Electrical", "Shelf Install", "Patch & Paint"],
-  "Carpenter": ["Custom Cabinets", "Door Installation", "Deck Building", "Wood Repair", "Trim Work", "Furniture Repair", "Framing"],
-  "Painter": ["Interior Painting", "Exterior Painting", "Cabinet Painting", "Wallpaper Install", "Texture Finish", "Deck Staining", "Epoxy Flooring"],
-  "Locksmith": ["Lock Install", "Lock Rekey", "Safe Opening", "Key Duplication", "Emergency Lockout", "Master Key Setup"],
-  "Welder": ["MIG Welding", "TIG Welding", "Structural Welding", "Pipe Welding", "Metal Fabrication", "Repair Welding"],
-  "Roofer": ["Roof Inspection", "Shingle Replacement", "Flat Roof Repair", "Gutter Install", "Flashing Repair", "Emergency Tarp"],
-  "Flooring Specialist": ["Hardwood Install", "Tile Install", "Laminate Install", "Carpet Fitting", "Subfloor Repair", "Floor Refinishing"],
-  "Tiler": ["Bathroom Tiling", "Kitchen Backsplash", "Floor Tiling", "Tile Repair", "Grout Cleaning", "Mosaic Work"],
-  "Window & Door Specialist": ["Window Install", "Door Install", "Weatherstripping", "Glass Replacement", "Screen Repair", "Sliding Door Repair"],
-  "Cleaning Specialist": ["Deep Cleaning", "Move-in/out Cleaning", "Carpet Steam Clean", "Pressure Washing", "Window Cleaning", "Post-construction Cleaning"],
-  "Pest Control": ["Inspection", "Ant Treatment", "Roach Treatment", "Rodent Control", "Termite Treatment", "Bed Bug Treatment", "Mosquito Control"],
-  "Landscaper": ["Lawn Mowing", "Hedge Trimming", "Garden Design", "Irrigation Install", "Tree Trimming", "Mulching", "Lawn Aeration"],
-  "Pool Technician": ["Pool Cleaning", "Water Chemistry", "Pump Repair", "Filter Service", "Heater Repair", "Pool Opening/Closing"],
-  "Elevator Technician": ["Maintenance", "Repair", "Modernization", "Safety Inspection", "Emergency Service"],
-  "Fire Safety Technician": ["Fire Alarm Install", "Sprinkler Service", "Extinguisher Inspection", "Fire Safety Audit", "Suppression System"],
-  "Smart Home Specialist": ["Smart Hub Setup", "Voice Assistant Config", "Smart Lighting", "Smart Security", "Home Theater Setup", "Automation Programming"],
+export const PROFESSION_SERVICES: Record<string, string[]> = {
+  "AC Technician": ["AC Installation", "AC Gas Refilling", "AC Servicing & Cleaning", "AC Repair", "Thermostat Replacement", "Compressor Service", "Duct Cleaning"],
+  "Refrigerator Repair": ["Gas Refilling", "Compressor Replacement", "Cooling Coil Repair", "Thermostat Fix", "Door Seal Replacement", "PCB Repair", "Ice Maker Fix"],
+  "Washing Machine Repair": ["Not Spinning Fix", "Drain Issue", "PCB Repair", "Motor Replacement", "Drum Repair", "Water Inlet Fix", "Door Latch Repair"],
+  "Microwave & Oven Repair": ["Magnetron Replacement", "Turntable Fix", "Control Panel Repair", "Door Hinge Fix", "Heating Element", "Fan Motor Repair"],
+  "RO / Water Purifier Service": ["Filter Replacement", "Membrane Change", "Annual Servicing", "Installation", "TDS Check", "UV Lamp Replacement", "Pump Repair"],
+  "Laptop & PC Repair": ["Hardware Repair", "OS Installation", "Virus Removal", "Data Recovery", "Screen Replacement", "RAM/SSD Upgrade", "Battery Replacement"],
+  "Mobile Phone Repair": ["Screen Replacement", "Battery Replacement", "Charging Port Fix", "Speaker Repair", "Back Glass Replacement", "Software Flash", "Water Damage"],
+  "TV & Display Repair": ["Screen Repair", "Backlight Fix", "HDMI Port Repair", "Remote Programming", "Smart TV Setup", "Power Board Fix", "Speaker Repair"],
+  "CCTV & Security Systems": ["CCTV Installation", "DVR/NVR Setup", "Remote Viewing Config", "Camera Repair", "Access Control", "Alarm System", "Intercom Setup"],
+  "Networking & WiFi Setup": ["Router Config", "WiFi Extender Setup", "LAN Cabling", "Network Troubleshooting", "Firewall Config", "VPN Setup", "Home Office Network"],
+  "Smart Home Automation": ["Smart Hub Setup", "Voice Assistant Config", "Smart Lighting", "Smart Lock Install", "Home Theater Setup", "Automation Programming", "Smart AC Control"],
+  "Electrician": ["Wiring & Rewiring", "MCB/Fuse Box", "Outlet Installation", "Lighting Setup", "Fan Installation", "Earthing Check", "Short Circuit Fix"],
+  "Plumber": ["Pipe Repair", "Leak Detection", "Water Heater Install", "Drain Cleaning", "Tap/Faucet Fix", "Toilet Repair", "Geyser Installation"],
+  "Carpenter": ["Furniture Repair", "Door/Window Fix", "Cabinet Making", "Shelving", "Wardrobe Fitting", "Wooden Flooring", "Furniture Assembly"],
+  "Painter": ["Interior Painting", "Exterior Painting", "Texture Finish", "Wallpaper Install", "Waterproofing", "Wood Polish", "Epoxy Flooring"],
+  "Pest Control Specialist": ["General Pest Control", "Cockroach Treatment", "Ant Treatment", "Rodent Control", "Termite Treatment", "Bed Bug Treatment", "Mosquito Fogging"],
+  "Cleaning Specialist": ["Deep Cleaning", "Sofa & Carpet Cleaning", "Kitchen Deep Clean", "Bathroom Sanitisation", "Move-in/out Clean", "Post-construction Clean", "Water Tank Cleaning"],
+  "Locksmith": ["Lock Installation", "Lock Repair", "Key Duplication", "Emergency Lockout", "Digital Lock Setup", "Safe Opening", "Master Key Setup"],
+  "HVAC / Ducting": ["Duct Cleaning", "Duct Installation", "Ventilation Repair", "Exhaust Fan Install", "AHU Service", "Chiller Service", "Thermostat Calibration"],
+  "Tiling & Flooring": ["Floor Tiling", "Wall Tiling", "Tile Repair/Replacement", "Grout Cleaning", "Vinyl Flooring", "Marble Polishing", "Anti-slip Treatment"],
+  "Solar Panel Service": ["Solar Panel Install", "Inverter Setup", "Battery Storage", "System Audit", "Panel Cleaning", "Wiring & Connection", "Monitoring Setup"],
+  "Generator & Inverter": ["Installation", "Battery Replacement", "Wiring Fix", "Load Testing", "AMC Service", "Repair & Overhaul"],
+  "Glass & Aluminium Work": ["Window Fitting", "Glass Replacement", "Aluminium Partition", "Sliding Door Repair", "Shower Cubicle", "Glass Railing", "Mirror Fixing"],
+  "Custom / Other": ["On-site Diagnosis", "Consultation", "General Maintenance", "Custom Repair", "Emergency Visit"],
 };
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -92,7 +91,7 @@ const STEP_LABELS = [
   { icon: <Wrench className="w-4 h-4" />,      label: "SERVICES" },
   { icon: <DollarSign className="w-4 h-4" />,  label: "PRICING" },
   { icon: <Clock className="w-4 h-4" />,       label: "SCHEDULE" },
-  { icon: <MapPin className="w-4 h-4" />,      label: "COVERAGE" },
+  { icon: <Eye className="w-4 h-4" />,         label: "PREVIEW" },
 ];
 
 type ServicesOffered = Record<string, string[]>;
@@ -102,6 +101,9 @@ type WizardData = {
   dateOfBirth: string;
   languagesSpoken: string[];
   bio: string;
+  serviceCity: string;
+  pinCode: string;
+  serviceRadius: string;
   profession: string[];
   yearsExperience: string;
   certifications: string;
@@ -123,9 +125,6 @@ type WizardData = {
   emergencyAvailable: boolean;
   vacationMode: boolean;
   maxDailyBookings: string;
-  serviceCity: string;
-  pinCode: string;
-  serviceRadius: string;
 };
 
 const DEFAULT: WizardData = {
@@ -133,6 +132,9 @@ const DEFAULT: WizardData = {
   dateOfBirth: "",
   languagesSpoken: ["English"],
   bio: "",
+  serviceCity: "",
+  pinCode: "",
+  serviceRadius: "20",
   profession: [],
   yearsExperience: "",
   certifications: "",
@@ -154,9 +156,6 @@ const DEFAULT: WizardData = {
   emergencyAvailable: false,
   vacationMode: false,
   maxDailyBookings: "5",
-  serviceCity: "",
-  pinCode: "",
-  serviceRadius: "20",
 };
 
 function ToggleChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
@@ -258,6 +257,9 @@ export default function TechnicianOnboarding() {
         dateOfBirth: existingProfile.dateOfBirth ?? "",
         languagesSpoken: existingProfile.languagesSpoken?.length ? existingProfile.languagesSpoken : ["English"],
         bio: existingProfile.bio ?? "",
+        serviceCity: existingProfile.serviceCity ?? "",
+        pinCode: existingProfile.pinCode ?? "",
+        serviceRadius: existingProfile.serviceRadius?.toString() ?? "20",
         profession: existingProfile.profession ?? [],
         yearsExperience: existingProfile.yearsExperience?.toString() ?? "",
         certifications: existingProfile.certifications?.join(", ") ?? "",
@@ -278,9 +280,6 @@ export default function TechnicianOnboarding() {
         emergencyAvailable: existingProfile.emergencyAvailable ?? false,
         vacationMode: existingProfile.vacationMode ?? false,
         maxDailyBookings: existingProfile.maxDailyBookings?.toString() ?? "5",
-        serviceCity: existingProfile.serviceCity ?? "",
-        pinCode: existingProfile.pinCode ?? "",
-        serviceRadius: existingProfile.serviceRadius?.toString() ?? "20",
       }));
       setInitializing(false);
     }
@@ -417,7 +416,7 @@ export default function TechnicianOnboarding() {
           dateOfBirth: data.dateOfBirth || undefined,
         },
       });
-      toast({ title: "Profile Complete", description: "Your technician profile is live." });
+      toast({ title: "Profile Live", description: "Your technician profile is now visible to customers." });
       setLocation("/technician/dashboard");
     } catch (err: any) {
       toast({ title: "Save Failed", description: err.message ?? "Please try again.", variant: "destructive" });
@@ -485,25 +484,27 @@ export default function TechnicianOnboarding() {
         <div className="border border-border bg-card rounded-lg p-6 relative overflow-hidden min-h-[420px]">
           <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60" />
 
-          {/* Step 1: Personal */}
+          {/* Step 1: Personal + Location */}
           {step === 0 && (
             <div className="space-y-5">
-              <SectionHeading>Personal Information</SectionHeading>
-              <FieldRow label="Gender">
-                <div className="flex flex-wrap gap-2">
-                  {GENDER_OPTIONS.map(g => (
-                    <ToggleChip key={g} label={g} active={data.gender === g} onClick={() => set("gender", g)} />
-                  ))}
-                </div>
-              </FieldRow>
-              <FieldRow label="Date of Birth">
-                <Input
-                  type="date"
-                  value={data.dateOfBirth}
-                  onChange={e => set("dateOfBirth", e.target.value)}
-                  className="bg-background/50 font-mono max-w-xs"
-                />
-              </FieldRow>
+              <SectionHeading>Personal Details & Service Location</SectionHeading>
+              <div className="grid grid-cols-2 gap-4">
+                <FieldRow label="Gender">
+                  <div className="flex flex-wrap gap-2">
+                    {GENDER_OPTIONS.map(g => (
+                      <ToggleChip key={g} label={g} active={data.gender === g} onClick={() => set("gender", g)} />
+                    ))}
+                  </div>
+                </FieldRow>
+                <FieldRow label="Date of Birth">
+                  <Input
+                    type="date"
+                    value={data.dateOfBirth}
+                    onChange={e => set("dateOfBirth", e.target.value)}
+                    className="bg-background/50 font-mono"
+                  />
+                </FieldRow>
+              </div>
               <FieldRow label="Languages Spoken">
                 <div className="flex flex-wrap gap-2">
                   {LANGUAGES.map(l => (
@@ -516,12 +517,41 @@ export default function TechnicianOnboarding() {
                   ))}
                 </div>
               </FieldRow>
+              <div className="grid grid-cols-2 gap-4">
+                <FieldRow label="Service City / District">
+                  <Input
+                    placeholder="e.g. Mumbai"
+                    value={data.serviceCity}
+                    onChange={e => set("serviceCity", e.target.value)}
+                    className="bg-background/50 font-mono"
+                  />
+                </FieldRow>
+                <FieldRow label="PIN / ZIP Code">
+                  <Input
+                    placeholder="e.g. 400001"
+                    value={data.pinCode}
+                    onChange={e => set("pinCode", e.target.value)}
+                    className="bg-background/50 font-mono"
+                  />
+                </FieldRow>
+              </div>
+              <FieldRow label={`Service Radius — ${data.serviceRadius} km`}>
+                <input
+                  type="range" min="1" max="100"
+                  value={data.serviceRadius}
+                  onChange={e => set("serviceRadius", e.target.value)}
+                  className="w-full accent-primary"
+                />
+                <div className="flex justify-between text-xs font-mono text-muted-foreground">
+                  <span>1 km</span><span>100 km</span>
+                </div>
+              </FieldRow>
               <FieldRow label="Professional Bio">
                 <Textarea
                   placeholder="Describe your experience, specialties, and what sets you apart..."
                   value={data.bio}
                   onChange={e => set("bio", e.target.value)}
-                  rows={4}
+                  rows={3}
                   className="bg-background/50 font-mono resize-none"
                 />
               </FieldRow>
@@ -532,7 +562,7 @@ export default function TechnicianOnboarding() {
           {step === 1 && (
             <div className="space-y-5">
               <SectionHeading>Professional Expertise</SectionHeading>
-              <FieldRow label="Profession / Role (select all that apply)">
+              <FieldRow label="Profession / Specialisation (select all that apply)">
                 <div className="flex flex-wrap gap-2">
                   {PROFESSIONS.map(p => (
                     <ToggleChip
@@ -545,7 +575,7 @@ export default function TechnicianOnboarding() {
                 </div>
                 {data.profession.length > 0 && (
                   <p className="text-xs font-mono text-primary mt-2">
-                    {data.profession.length} selected — you'll pick services for each in the next step
+                    {data.profession.length} selected — pick services for each in Step 3
                   </p>
                 )}
               </FieldRow>
@@ -560,7 +590,7 @@ export default function TechnicianOnboarding() {
                 </FieldRow>
                 <FieldRow label="Previous Company">
                   <Input
-                    placeholder="e.g. HomeServe Inc."
+                    placeholder="e.g. Whirlpool Service"
                     value={data.previousCompany}
                     onChange={e => set("previousCompany", e.target.value)}
                     className="bg-background/50 font-mono"
@@ -569,7 +599,7 @@ export default function TechnicianOnboarding() {
               </div>
               <FieldRow label="Certifications (comma-separated)">
                 <Input
-                  placeholder="e.g. OSHA 10, EPA 608, CompTIA A+"
+                  placeholder="e.g. ITI Electrician, RAC Diploma, CompTIA A+"
                   value={data.certifications}
                   onChange={e => set("certifications", e.target.value)}
                   className="bg-background/50 font-mono"
@@ -577,15 +607,15 @@ export default function TechnicianOnboarding() {
               </FieldRow>
               <FieldRow label="Areas of Expertise (comma-separated)">
                 <Input
-                  placeholder="e.g. Circuit breakers, Water heaters, CCTV installation"
+                  placeholder="e.g. Split AC, Water purifiers, iPhone repair"
                   value={data.areasOfExpertise}
                   onChange={e => set("areasOfExpertise", e.target.value)}
                   className="bg-background/50 font-mono"
                 />
               </FieldRow>
-              <FieldRow label="Skills / Tools (comma-separated)">
+              <FieldRow label="Tools & Skills (comma-separated)">
                 <Input
-                  placeholder="e.g. Multimeter, Pipe wrench, Oscilloscope"
+                  placeholder="e.g. Multimeter, Soldering iron, Oscilloscope"
                   value={data.skills}
                   onChange={e => set("skills", e.target.value)}
                   className="bg-background/50 font-mono"
@@ -594,75 +624,75 @@ export default function TechnicianOnboarding() {
             </div>
           )}
 
-          {/* Step 3: Services offered per profession */}
+          {/* Step 3: Services per profession */}
           {step === 2 && (
             <div className="space-y-5">
               <SectionHeading>Services Offered</SectionHeading>
               {data.profession.length === 0 ? (
                 <div className="py-8 text-center border border-border/40 rounded-lg bg-muted/10">
                   <p className="text-xs font-mono text-muted-foreground">
-                    No professions selected. Go back to Step 2 to pick your roles.
+                    No professions selected — go back to Step 2 to pick your specialisations.
                   </p>
                   <Button variant="outline" size="sm" className="mt-3 font-mono text-xs uppercase" onClick={() => setStep(1)}>
                     ← Back to Expertise
                   </Button>
                 </div>
               ) : (
-                data.profession.map(prof => {
-                  const presets = PROFESSION_SERVICES[prof] ?? [];
-                  const selected = data.servicesOffered[prof] ?? [];
-                  return (
-                    <div key={prof} className="border border-border/50 rounded-lg p-4 space-y-3">
-                      <h4 className="font-mono text-sm font-bold text-primary uppercase">{prof}</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {presets.map(svc => (
-                          <ToggleChip
-                            key={svc}
-                            label={svc}
-                            active={selected.includes(svc)}
-                            onClick={() => toggleService(prof, svc)}
+                <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1">
+                  {data.profession.map(prof => {
+                    const presets = PROFESSION_SERVICES[prof] ?? [];
+                    const selected = data.servicesOffered[prof] ?? [];
+                    return (
+                      <div key={prof} className="border border-border/50 rounded-lg p-4 space-y-3">
+                        <h4 className="font-mono text-sm font-bold text-primary uppercase">{prof}</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {presets.map(svc => (
+                            <ToggleChip
+                              key={svc}
+                              label={svc}
+                              active={selected.includes(svc)}
+                              onClick={() => toggleService(prof, svc)}
+                            />
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Add custom service..."
+                            value={data.customServices[prof] ?? ""}
+                            onChange={e =>
+                              setData(prev => ({
+                                ...prev,
+                                customServices: { ...prev.customServices, [prof]: e.target.value },
+                              }))
+                            }
+                            onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCustomService(prof); } }}
+                            className="bg-background/50 font-mono text-xs h-8"
                           />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-3 font-mono text-xs shrink-0"
+                            onClick={() => addCustomService(prof)}
+                          >
+                            <PlusCircle className="w-3.5 h-3.5 mr-1" /> Add
+                          </Button>
+                        </div>
+                        {selected.filter(s => !presets.includes(s)).map(s => (
+                          <span key={s} className="inline-flex items-center gap-1 text-[10px] font-mono border border-primary/40 px-2 py-0.5 rounded text-primary bg-primary/10 mr-1.5 mb-1">
+                            {s}
+                            <button type="button" onClick={() => toggleService(prof, s)}>
+                              <X className="w-2.5 h-2.5" />
+                            </button>
+                          </span>
                         ))}
+                        <p className="text-[10px] font-mono text-muted-foreground">
+                          {selected.length} service{selected.length !== 1 ? "s" : ""} selected
+                        </p>
                       </div>
-                      {/* Custom services */}
-                      <div className="flex gap-2 mt-2">
-                        <Input
-                          placeholder="Add custom service..."
-                          value={data.customServices[prof] ?? ""}
-                          onChange={e =>
-                            setData(prev => ({
-                              ...prev,
-                              customServices: { ...prev.customServices, [prof]: e.target.value },
-                            }))
-                          }
-                          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCustomService(prof); } }}
-                          className="bg-background/50 font-mono text-xs h-8"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-8 px-3 font-mono text-xs shrink-0"
-                          onClick={() => addCustomService(prof)}
-                        >
-                          <PlusCircle className="w-3.5 h-3.5 mr-1" /> Add
-                        </Button>
-                      </div>
-                      {/* Show non-preset selected items (custom) */}
-                      {selected.filter(s => !presets.includes(s)).map(s => (
-                        <span key={s} className="inline-flex items-center gap-1 text-[10px] font-mono border border-primary/40 px-2 py-0.5 rounded text-primary bg-primary/10 mr-1.5 mb-1">
-                          {s}
-                          <button type="button" onClick={() => toggleService(prof, s)}>
-                            <X className="w-2.5 h-2.5" />
-                          </button>
-                        </span>
-                      ))}
-                      <p className="text-[10px] font-mono text-muted-foreground">
-                        {selected.length} service{selected.length !== 1 ? "s" : ""} selected
-                      </p>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
             </div>
           )}
@@ -673,13 +703,13 @@ export default function TechnicianOnboarding() {
               <SectionHeading>Pricing Structure</SectionHeading>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { key: "hourlyRate" as const,      label: "Hourly Rate ($)",         ph: "e.g. 75" },
-                  { key: "perJobRate" as const,       label: "Per-Job Flat Rate ($)",   ph: "e.g. 120" },
+                  { key: "hourlyRate" as const,      label: "Hourly Rate ($)",          ph: "e.g. 75" },
+                  { key: "perJobRate" as const,       label: "Per-Job Flat Rate ($)",    ph: "e.g. 120" },
                   { key: "visitCharge" as const,      label: "Visit / Call-out Fee ($)", ph: "e.g. 25" },
-                  { key: "inspectionCharge" as const, label: "Inspection Fee ($)",      ph: "e.g. 40" },
-                  { key: "emergencyCharge" as const,  label: "Emergency Surcharge ($)", ph: "e.g. 50" },
-                  { key: "weekendCharge" as const,    label: "Weekend Surcharge ($)",   ph: "e.g. 30" },
-                  { key: "nightCharge" as const,      label: "Night Surcharge ($)",     ph: "e.g. 35" },
+                  { key: "inspectionCharge" as const, label: "Inspection Fee ($)",       ph: "e.g. 40" },
+                  { key: "emergencyCharge" as const,  label: "Emergency Surcharge ($)",  ph: "e.g. 50" },
+                  { key: "weekendCharge" as const,    label: "Weekend Surcharge ($)",    ph: "e.g. 30" },
+                  { key: "nightCharge" as const,      label: "Night Surcharge ($)",      ph: "e.g. 35" },
                 ].map(({ key, label, ph }) => (
                   <FieldRow key={key} label={label}>
                     <Input
@@ -745,71 +775,32 @@ export default function TechnicianOnboarding() {
                 checked={data.emergencyAvailable}
                 onChange={v => set("emergencyAvailable", v)}
                 label="Emergency / 24-7 Available"
-                description="Accept urgent calls outside working hours"
+                description="Accept urgent calls outside working hours — emergency surcharge applies"
                 icon={<Zap className="w-5 h-5" />}
               />
               <ToggleSwitch
                 checked={data.vacationMode}
                 onChange={v => set("vacationMode", v)}
                 label="Vacation Mode"
-                description="Pause all incoming bookings temporarily"
+                description="Pause all incoming bookings temporarily while you're away"
                 icon={<span className="text-lg">🏖</span>}
               />
             </div>
           )}
 
-          {/* Step 6: Coverage + Profile Preview */}
+          {/* Step 6: Profile Preview */}
           {step === 5 && (
             <div className="space-y-5">
-              <SectionHeading>Coverage Area & Profile Preview</SectionHeading>
-              <div className="grid grid-cols-2 gap-4">
-                <FieldRow label="City / District">
-                  <Input
-                    placeholder="e.g. San Francisco"
-                    value={data.serviceCity}
-                    onChange={e => set("serviceCity", e.target.value)}
-                    className="bg-background/50 font-mono"
-                  />
-                </FieldRow>
-                <FieldRow label="ZIP / PIN Code">
-                  <Input
-                    placeholder="e.g. 94103"
-                    value={data.pinCode}
-                    onChange={e => set("pinCode", e.target.value)}
-                    className="bg-background/50 font-mono"
-                  />
-                </FieldRow>
-              </div>
-              <FieldRow label="Service Radius (km)">
-                <div className="space-y-2">
-                  <input
-                    type="range" min="1" max="100"
-                    value={data.serviceRadius}
-                    onChange={e => set("serviceRadius", e.target.value)}
-                    className="w-full accent-primary"
-                  />
-                  <div className="flex justify-between text-xs font-mono text-muted-foreground">
-                    <span>1 km</span>
-                    <span className="text-primary font-bold">{data.serviceRadius} km</span>
-                    <span>100 km</span>
-                  </div>
-                </div>
-              </FieldRow>
-
-              <div className="border-t border-border/40 pt-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Eye className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-mono uppercase text-primary tracking-widest">
-                    How Customers Will See You
-                  </span>
-                </div>
-                <TechnicianProfileCard technician={buildPreviewTech()} />
-              </div>
-
+              <SectionHeading>Your Public Profile Preview</SectionHeading>
+              <p className="text-xs font-mono text-muted-foreground">
+                This is exactly how customers will see your profile when browsing technicians.
+              </p>
+              <TechnicianProfileCard technician={buildPreviewTech()} />
               <div className="border border-yellow-400/20 bg-yellow-400/5 rounded-lg p-3 flex items-start gap-2">
                 <CheckCircle className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
                 <p className="text-xs font-mono text-muted-foreground">
-                  Review your profile above. You can always update it from <strong>Settings</strong>. Click <strong>LAUNCH PROFILE</strong> to go live.
+                  You can update any of these details later from <strong>Settings → Technician Profile</strong>.
+                  Click <strong>LAUNCH PROFILE</strong> to go live.
                 </p>
               </div>
             </div>
