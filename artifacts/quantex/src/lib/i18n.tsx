@@ -198,6 +198,7 @@ const en: T = {
   an_cust_count: "Total Customers",
   an_avg_rating: "Avg Tech Rating",
   an_avg_rev: "Avg Repair Value",
+  ai_error: "I'm having trouble connecting to the AI right now. Please try again or book a technician directly.",
   mic_listening: "Listening...", mic_unsupported: "Voice input not supported",
 };
 
@@ -357,6 +358,7 @@ const gu: T = {
   an_cust_count: "Kul Grahako",
   an_avg_rating: "Sar Tech Rating",
   an_avg_rev: "Sar Sudhaar Mool",
+  ai_error: "AI se connect thavama taklif padai chhe. Pharthi prayaas karo athva seedha technician book karo.",
   mic_listening: "Saaambhalu chhu...", mic_unsupported: "Tamara browser maa voice input samarthan nathi",
 };
 
@@ -516,6 +518,7 @@ const hi: T = {
   an_cust_count: "कुल ग्राहक",
   an_avg_rating: "औसत तकनीशियन रेटिंग",
   an_avg_rev: "औसत मरम्मत मूल्य",
+  ai_error: "AI से कनेक्ट करने में समस्या हो रही है। कृपया फिर से प्रयास करें या सीधे तकनीशियन बुक करें।",
   mic_listening: "सुन रहा हूँ...", mic_unsupported: "इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है",
 };
 
@@ -675,6 +678,7 @@ const fr: T = {
   an_cust_count: "Total clients",
   an_avg_rating: "Note tech. moy.",
   an_avg_rev: "Valeur réparation moy.",
+  ai_error: "J'ai du mal à me connecter à l'IA. Veuillez réessayer ou réserver directement un technicien.",
   mic_listening: "Écoute en cours...", mic_unsupported: "Saisie vocale non prise en charge",
 };
 
@@ -834,6 +838,7 @@ const de: T = {
   an_cust_count: "Gesamtkunden",
   an_avg_rating: "Ø Tech-Bewertung",
   an_avg_rev: "Ø Reparaturwert",
+  ai_error: "Es gibt Verbindungsprobleme mit der KI. Bitte versuchen Sie es erneut oder buchen Sie direkt einen Techniker.",
   mic_listening: "Höre zu...", mic_unsupported: "Spracheingabe nicht unterstützt",
 };
 
@@ -993,6 +998,7 @@ const zh: T = {
   an_cust_count: "总客户数",
   an_avg_rating: "平均技术人员评分",
   an_avg_rev: "平均维修价值",
+  ai_error: "AI连接暂时出现问题。请重试或直接预约技术人员。",
   mic_listening: "正在聆听...", mic_unsupported: "此浏览器不支持语音输入",
 };
 

@@ -96,7 +96,7 @@ export default function AIAssistant() {
     } catch {
       setMessages((prev) => [...prev, {
         role: "assistant",
-        content: "I'm having trouble connecting to the AI right now. Please try again or book a technician directly.",
+        content: t("ai_error"),
       }]);
     } finally {
       setIsAnalyzing(false);
