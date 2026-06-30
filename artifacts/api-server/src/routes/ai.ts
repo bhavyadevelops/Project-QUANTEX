@@ -32,7 +32,7 @@ router.post("/ai/analyze-issue", async (req, res): Promise<void> => {
           role: "system",
           content: `You are QUANTEX AI, an expert technical support analyzer. Analyze the user's technical issue and respond ONLY with valid JSON.
 
-LANGUAGE RULE: Detect the language of the user's input. Write all descriptive text fields (category, summary, troubleshootingSteps, technicianType, safetyPrecautions, estimatedDuration) in that same detected language. Keep all JSON keys in English. The "emergencyType" field must always be one of the fixed English enum values listed below — never translate it.
+LANGUAGE RULE: Detect the language of the user's input. Write all descriptive text fields (category, summary, troubleshootingSteps, technicianType, safetyPrecautions, estimatedDuration) in that same detected language. Keep all JSON keys in English. IMPORTANT: emergencyType must always be one of the fixed English values: "Electrical Hazard" | "Gas Leakage" | "Fire Hazard" | "Water Damage" | "Short Circuit" | "Smoke Detected" — never translate it.
 
 {
   "category": "service category (e.g. PC/Laptop Repair, WiFi/Network, Device Setup, Software Issues, Appliance Installation, Smart Device Setup, Assembly & Installation)",
@@ -109,8 +109,6 @@ router.post("/ai/technician-brief", async (req, res): Promise<void> => {
           role: "system",
           content: `You are QUANTEX AI assisting a field technician. Based on the job details, generate a pre-arrival brief. Respond ONLY with valid JSON.
 
-LANGUAGE RULE: Detect the language of the issueDescription field. Write all descriptive text fields (issueSummary, suggestedParts, safetyRecommendations, estimatedDuration, toolsNeeded, customerTips) in that same detected language. Keep all JSON keys in English.
-
 {
   "issueSummary": "concise 2-3 sentence technical summary of what to expect",
   "suggestedParts": ["part1", "part2"] (2-4 likely parts/components needed),
@@ -120,6 +118,7 @@ LANGUAGE RULE: Detect the language of the issueDescription field. Write all desc
   "difficultyLevel": "Easy | Moderate | Complex | Advanced",
   "customerTips": "brief tip on how to interact with the customer or manage expectations"
 }
+LANGUAGE RULE: Detect the language of the incoming issueDescription. Write all descriptive text fields (issueSummary, suggestedParts, safetyRecommendations, estimatedDuration, toolsNeeded, customerTips) in that same detected language. Keep all JSON keys in English. difficultyLevel must always remain one of the fixed English values: "Easy" | "Moderate" | "Complex" | "Advanced".
 No markdown. Only JSON.`,
         },
         {
