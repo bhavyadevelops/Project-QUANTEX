@@ -1,0 +1,284 @@
+# 19. Comprehensive Technician Registration & Professional Profile
+
+The current technician registration form is too limited. Redesign it into a complete professional onboarding experience while keeping it simple, intuitive, and mobile-friendly.
+
+The goal is to collect enough information to build a trustworthy technician profile and improve AI-powered matching, pricing, and customer confidence.
+
+## Personal Information
+
+* Full Name
+* Profile Photo
+* Date of Birth
+* Gender (Optional)
+* Mobile Number
+* Email Address
+* Government ID Verification
+* Address
+* Current City
+* PIN Code
+
+---
+
+## Professional Information
+
+Allow technicians to clearly define what they do.
+
+Examples:
+
+* Electrician
+* Plumber
+* Carpenter
+* AC Technician
+* Appliance Repair
+* Computer Repair
+* Laptop Repair
+* Mobile Repair
+* CCTV Installation
+* RO Service
+* Painter
+* Welder
+* Mason
+* Interior Work
+* Furniture Assembly
+* Mechanic
+* Solar Technician
+* Internet & Networking
+* Smart Home Installation
+* Pest Control
+* Cleaning Services
+* Gardening
+* Home Automation
+* Custom Service (Other)
+
+Support multiple professions if applicable.
+
+---
+
+## Services Offered
+
+Each technician should be able to select multiple services under their profession.
+
+Example:
+
+Electrician
+
+* Fan Installation
+* Switch Repair
+* Wiring
+* MCB Replacement
+* Meter Installation
+* Short Circuit Repair
+* Emergency Electrical Service
+
+Computer Repair
+
+* Virus Removal
+* SSD Upgrade
+* RAM Upgrade
+* Windows Installation
+* Data Recovery
+* Laptop Screen Replacement
+* Motherboard Repair
+
+The list of services should dynamically adapt based on the selected profession, with an option to add custom services.
+
+---
+
+## Experience
+
+Collect:
+
+* Years of Experience
+* Certifications
+* Training
+* Company Previously Worked For (Optional)
+* Areas of Expertise
+* Languages Spoken
+
+---
+
+## Pricing
+
+Allow technicians to define how they charge.
+
+Supported pricing models:
+
+* Fixed Visit Charge
+* Hourly Rate
+* Per Job
+* Inspection Charge
+* Emergency Service Charge
+* Weekend/Holiday Charge
+* Night Service Charge
+
+Example:
+
+Visit Charge:
+₹200
+
+Hourly:
+₹500/hour
+
+Emergency:
+₹100 extra
+
+The platform should display these charges transparently before booking.
+
+---
+
+## Availability
+
+Technicians should configure:
+
+* Working Days
+* Working Hours
+* Emergency Availability
+* Vacation Mode
+* Maximum Daily Bookings
+* Maximum Travel Distance (Service Radius)
+
+Example:
+
+Monday–Saturday
+
+9:00 AM – 7:00 PM
+
+Emergency:
+Yes
+
+Maximum Radius:
+20 km
+
+---
+
+## Service Area
+
+Allow technicians to specify:
+
+* Current Location
+* Preferred Service Locations
+* Maximum Travel Radius
+* Multiple Cities (if applicable)
+
+Display this information during customer searches.
+
+---
+
+## Equipment & Capabilities
+
+Technicians can indicate:
+
+* Own Vehicle
+* Bike
+* Car
+* Van
+* Tools Available
+* Specialized Equipment
+* Heavy Machinery
+* Ladder
+* Generator
+* Other Equipment
+
+This helps customers understand service readiness.
+
+---
+
+## Portfolio
+
+Allow technicians to upload:
+
+* Previous Work Photos
+* Certifications
+* Licenses
+* Awards
+* Project Images
+* Before & After Images
+
+Display these in their public profile.
+
+---
+
+## Identity & Trust
+
+Support verification for:
+
+* Government ID
+* Phone Number
+* Email
+* Address
+* Professional Certificates
+* Business Registration (Optional)
+
+Verified technicians should receive trust badges.
+
+---
+
+## Banking & Payments
+
+Securely collect:
+
+* UPI ID
+* Bank Account Details (if required)
+* Preferred Payment Methods
+* GST Number (Optional)
+
+Ensure sensitive information is encrypted and not publicly visible.
+
+---
+
+## Professional Profile Preview
+
+Before submitting, show technicians a preview of their public profile exactly as customers will see it.
+
+Include:
+
+* Name
+* Photo
+* Profession
+* Skills
+* Services
+* Pricing
+* Experience
+* Certifications
+* Availability
+* Ratings (once available)
+* Portfolio
+* Verification Badges
+
+Allow edits before final submission.
+
+---
+
+## Editable Profile
+
+After registration, technicians should be able to update:
+
+* Services
+* Prices
+* Availability
+* Portfolio
+* Certifications
+* Service Radius
+* Working Hours
+* Contact Preferences
+* Emergency Availability
+
+Changes should sync instantly across the platform.
+
+---
+
+## AI Integration
+
+The AI assistant should use technician profile data to improve recommendations by matching:
+
+* Required service
+* Relevant skills
+* Experience
+* Customer location
+* Service radius
+* Pricing
+* Availability
+* Ratings
+* Estimated arrival time
+
+This enables intelligent technician recommendations rather than simply listing every available technician.
