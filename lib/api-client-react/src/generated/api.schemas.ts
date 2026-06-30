@@ -81,6 +81,8 @@ export interface ServiceCategory {
   description: string;
 }
 
+export type TechnicianServicesOffered = {[key: string]: string[]};
+
 export interface Technician {
   id: number;
   userId: number;
@@ -99,7 +101,49 @@ export interface Technician {
   /** @nullable */
   distance?: number | null;
   categoryIds?: number[];
+  profession?: string[];
+  servicesOffered?: TechnicianServicesOffered;
+  /** @nullable */
+  yearsExperience?: number | null;
+  certifications?: string[];
+  /** @nullable */
+  previousCompany?: string | null;
+  areasOfExpertise?: string[];
+  languagesSpoken?: string[];
+  /** @nullable */
+  visitCharge?: number | null;
+  /** @nullable */
+  perJobRate?: number | null;
+  /** @nullable */
+  inspectionCharge?: number | null;
+  /** @nullable */
+  emergencyCharge?: number | null;
+  /** @nullable */
+  weekendCharge?: number | null;
+  /** @nullable */
+  nightCharge?: number | null;
+  workingDays?: string[];
+  /** @nullable */
+  workingHoursStart?: string | null;
+  /** @nullable */
+  workingHoursEnd?: string | null;
+  emergencyAvailable?: boolean;
+  vacationMode?: boolean;
+  /** @nullable */
+  maxDailyBookings?: number | null;
+  /** @nullable */
+  serviceRadius?: number | null;
+  /** @nullable */
+  serviceCity?: string | null;
+  /** @nullable */
+  pinCode?: string | null;
+  /** @nullable */
+  gender?: string | null;
+  /** @nullable */
+  dateOfBirth?: string | null;
 }
+
+export type TechnicianInputServicesOffered = {[key: string]: string[]};
 
 export interface TechnicianInput {
   bio?: string;
@@ -107,7 +151,33 @@ export interface TechnicianInput {
   hourlyRate: number;
   responseTime: string;
   categoryIds?: number[];
+  profession?: string[];
+  servicesOffered?: TechnicianInputServicesOffered;
+  yearsExperience?: number;
+  certifications?: string[];
+  previousCompany?: string;
+  areasOfExpertise?: string[];
+  languagesSpoken?: string[];
+  visitCharge?: number;
+  perJobRate?: number;
+  inspectionCharge?: number;
+  emergencyCharge?: number;
+  weekendCharge?: number;
+  nightCharge?: number;
+  workingDays?: string[];
+  workingHoursStart?: string;
+  workingHoursEnd?: string;
+  emergencyAvailable?: boolean;
+  vacationMode?: boolean;
+  maxDailyBookings?: number;
+  serviceRadius?: number;
+  serviceCity?: string;
+  pinCode?: string;
+  gender?: string;
+  dateOfBirth?: string;
 }
+
+export type TechnicianUpdateServicesOffered = {[key: string]: string[]};
 
 export interface TechnicianUpdate {
   bio?: string;
@@ -116,6 +186,31 @@ export interface TechnicianUpdate {
   responseTime?: string;
   isAvailable?: boolean;
   categoryIds?: number[];
+  avatarUrl?: string;
+  profession?: string[];
+  servicesOffered?: TechnicianUpdateServicesOffered;
+  yearsExperience?: number;
+  certifications?: string[];
+  previousCompany?: string;
+  areasOfExpertise?: string[];
+  languagesSpoken?: string[];
+  visitCharge?: number;
+  perJobRate?: number;
+  inspectionCharge?: number;
+  emergencyCharge?: number;
+  weekendCharge?: number;
+  nightCharge?: number;
+  workingDays?: string[];
+  workingHoursStart?: string;
+  workingHoursEnd?: string;
+  emergencyAvailable?: boolean;
+  vacationMode?: boolean;
+  maxDailyBookings?: number;
+  serviceRadius?: number;
+  serviceCity?: string;
+  pinCode?: string;
+  gender?: string;
+  dateOfBirth?: string;
 }
 
 export type BookingStatus = typeof BookingStatus[keyof typeof BookingStatus];

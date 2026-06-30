@@ -26,6 +26,7 @@ import Settings from "@/pages/settings";
 
 import TechnicianDashboard from "@/pages/technician/dashboard";
 import TechnicianBookings from "@/pages/technician/bookings";
+import TechnicianOnboarding from "@/pages/technician/onboarding";
 import Analytics from "@/pages/analytics";
 
 const queryClient = new QueryClient({
@@ -61,6 +62,9 @@ function Router() {
       </Route>
       <Route path="/settings">
         <ProtectedRoute allowedRoles={["customer", "technician"]}><Settings /></ProtectedRoute>
+      </Route>
+      <Route path="/technician/onboarding">
+        <ProtectedRoute allowedRoles={["technician"]}><TechnicianOnboarding /></ProtectedRoute>
       </Route>
       <Route path="/technician/dashboard">
         <ProtectedRoute allowedRoles={["technician"]}><TechnicianDashboard /></ProtectedRoute>

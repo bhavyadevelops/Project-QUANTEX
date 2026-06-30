@@ -39,7 +39,7 @@ export default function Register() {
       });
       setUser(response.user, response.token);
       toast({ title: "Access Granted", description: "Welcome to QUANTEX." });
-      setLocation(response.user.role === "technician" ? "/technician/dashboard" : "/dashboard");
+      setLocation(response.user.role === "technician" ? "/technician/onboarding" : "/dashboard");
     } catch (error: any) {
       toast({ title: "Registration Failed", description: error.message || "Failed to create account.", variant: "destructive" });
     }

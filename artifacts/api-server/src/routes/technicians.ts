@@ -12,6 +12,47 @@ import { getAuthUser } from "./auth";
 
 const router: IRouter = Router();
 
+function technicianRow(t: typeof techniciansTable.$inferSelect) {
+  return {
+    id: t.id,
+    userId: t.userId,
+    bio: t.bio,
+    avatarUrl: t.avatarUrl,
+    skills: t.skills,
+    rating: t.rating,
+    reviewCount: t.reviewCount,
+    isAvailable: t.isAvailable,
+    completedJobs: t.completedJobs,
+    hourlyRate: t.hourlyRate,
+    responseTime: t.responseTime,
+    categoryIds: t.categoryIds,
+    profession: t.profession,
+    servicesOffered: t.servicesOffered,
+    yearsExperience: t.yearsExperience,
+    certifications: t.certifications,
+    previousCompany: t.previousCompany,
+    areasOfExpertise: t.areasOfExpertise,
+    languagesSpoken: t.languagesSpoken,
+    visitCharge: t.visitCharge,
+    perJobRate: t.perJobRate,
+    inspectionCharge: t.inspectionCharge,
+    emergencyCharge: t.emergencyCharge,
+    weekendCharge: t.weekendCharge,
+    nightCharge: t.nightCharge,
+    workingDays: t.workingDays,
+    workingHoursStart: t.workingHoursStart,
+    workingHoursEnd: t.workingHoursEnd,
+    emergencyAvailable: t.emergencyAvailable,
+    vacationMode: t.vacationMode,
+    maxDailyBookings: t.maxDailyBookings,
+    serviceRadius: t.serviceRadius,
+    serviceCity: t.serviceCity,
+    pinCode: t.pinCode,
+    gender: t.gender,
+    dateOfBirth: t.dateOfBirth,
+  };
+}
+
 router.get("/technicians", async (req, res): Promise<void> => {
   const query = ListTechniciansQueryParams.safeParse(req.query);
   if (!query.success) {
@@ -24,33 +65,41 @@ router.get("/technicians", async (req, res): Promise<void> => {
     conditions.push(eq(techniciansTable.isAvailable, query.data.available));
   }
 
-  const technicians = await db
-    .select({
-      id: techniciansTable.id,
-      userId: techniciansTable.userId,
-      name: usersTable.name,
-      bio: techniciansTable.bio,
-      avatarUrl: techniciansTable.avatarUrl,
-      skills: techniciansTable.skills,
-      rating: techniciansTable.rating,
-      reviewCount: techniciansTable.reviewCount,
-      isAvailable: techniciansTable.isAvailable,
-      completedJobs: techniciansTable.completedJobs,
-      hourlyRate: techniciansTable.hourlyRate,
-      responseTime: techniciansTable.responseTime,
-      categoryIds: techniciansTable.categoryIds,
-    })
+  const rows = await db
+    .select()
     .from(techniciansTable)
     .innerJoin(usersTable, eq(techniciansTable.userId, usersTable.id))
     .where(conditions.length > 0 ? and(...conditions) : undefined)
     .limit(query.data.limit ?? 20);
 
-  const result = technicians.map(t => ({
-    ...t,
+  const result = rows.map(({ technicians: t, users: u }) => ({
+    ...technicianRow(t),
+    name: u.name,
     distance: Math.round(Math.random() * 10 * 10) / 10,
   }));
 
   res.json(result);
+});
+
+router.get("/technicians/me", async (req, res): Promise<void> => {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  const user = await getAuthUser(token);
+  if (!user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const [row] = await db
+    .select()
+    .from(techniciansTable)
+    .where(eq(techniciansTable.userId, user.id));
+
+  if (!row) {
+    res.status(404).json({ error: "No technician profile found" });
+    return;
+  }
+
+  res.json({ ...technicianRow(row), name: user.name, distance: null });
 });
 
 router.post("/technicians", async (req, res): Promise<void> => {
@@ -77,7 +126,7 @@ router.post("/technicians", async (req, res): Promise<void> => {
   }).returning();
 
   res.status(201).json({
-    ...technician,
+    ...technicianRow(technician),
     name: user.name,
     distance: null,
   });
@@ -90,35 +139,28 @@ router.get("/technicians/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const [technician] = await db
-    .select({
-      id: techniciansTable.id,
-      userId: techniciansTable.userId,
-      name: usersTable.name,
-      bio: techniciansTable.bio,
-      avatarUrl: techniciansTable.avatarUrl,
-      skills: techniciansTable.skills,
-      rating: techniciansTable.rating,
-      reviewCount: techniciansTable.reviewCount,
-      isAvailable: techniciansTable.isAvailable,
-      completedJobs: techniciansTable.completedJobs,
-      hourlyRate: techniciansTable.hourlyRate,
-      responseTime: techniciansTable.responseTime,
-      categoryIds: techniciansTable.categoryIds,
-    })
+  const [row] = await db
+    .select()
     .from(techniciansTable)
     .innerJoin(usersTable, eq(techniciansTable.userId, usersTable.id))
     .where(eq(techniciansTable.id, params.data.id));
 
-  if (!technician) {
+  if (!row) {
     res.status(404).json({ error: "Technician not found" });
     return;
   }
 
-  res.json({ ...technician, distance: null });
+  res.json({ ...technicianRow(row.technicians), name: row.users.name, distance: null });
 });
 
 router.patch("/technicians/:id", async (req, res): Promise<void> => {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  const user = await getAuthUser(token);
+  if (!user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
   const params = UpdateTechnicianParams.safeParse({ id: req.params.id });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -142,9 +184,7 @@ router.patch("/technicians/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, technician.userId));
-
-  res.json({ ...technician, name: user?.name ?? "", distance: null });
+  res.json({ ...technicianRow(technician), name: user.name, distance: null });
 });
 
 router.get("/technicians/:id/reviews", async (req, res): Promise<void> => {

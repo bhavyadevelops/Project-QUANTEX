@@ -809,6 +809,83 @@ export const useCreateTechnicianProfile = <TError = ErrorType<unknown>,
       return useMutation(getCreateTechnicianProfileMutationOptions(options));
     }
 
+export const getGetMyTechnicianProfileUrl = () => {
+
+
+
+
+  return `/api/technicians/me`
+}
+
+/**
+ * @summary Get the authenticated technician's own profile
+ */
+export const getMyTechnicianProfile = async ( options?: RequestInit): Promise<Technician> => {
+
+  return customFetch<Technician>(getGetMyTechnicianProfileUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMyTechnicianProfileQueryKey = () => {
+    return [
+    `/api/technicians/me`
+    ] as const;
+    }
+
+
+export const getGetMyTechnicianProfileQueryOptions = <TData = Awaited<ReturnType<typeof getMyTechnicianProfile>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyTechnicianProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMyTechnicianProfileQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyTechnicianProfile>>> = ({ signal }) => getMyTechnicianProfile({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyTechnicianProfile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMyTechnicianProfileQueryResult = NonNullable<Awaited<ReturnType<typeof getMyTechnicianProfile>>>
+export type GetMyTechnicianProfileQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get the authenticated technician's own profile
+ */
+
+export function useGetMyTechnicianProfile<TData = Awaited<ReturnType<typeof getMyTechnicianProfile>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyTechnicianProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMyTechnicianProfileQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export const getGetTechnicianUrl = (id: number,) => {
 
 

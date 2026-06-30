@@ -222,6 +222,23 @@ paths:
               schema:
                 $ref: "#/components/schemas/Technician"
 
+  /technicians/me:
+    get:
+      operationId: getMyTechnicianProfile
+      tags: [technicians]
+      summary: Get the authenticated technician's own profile
+      responses:
+        "200":
+          description: Technician profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Technician"
+        "401":
+          description: Unauthorized
+        "404":
+          description: No profile found
+
   /technicians/{id}:
     get:
       operationId: getTechnician
@@ -656,6 +673,68 @@ components:
           type: array
           items:
             type: integer
+        profession:
+          type: array
+          items:
+            type: string
+        servicesOffered:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        yearsExperience:
+          type: ["integer", "null"]
+        certifications:
+          type: array
+          items:
+            type: string
+        previousCompany:
+          type: ["string", "null"]
+        areasOfExpertise:
+          type: array
+          items:
+            type: string
+        languagesSpoken:
+          type: array
+          items:
+            type: string
+        visitCharge:
+          type: ["number", "null"]
+        perJobRate:
+          type: ["number", "null"]
+        inspectionCharge:
+          type: ["number", "null"]
+        emergencyCharge:
+          type: ["number", "null"]
+        weekendCharge:
+          type: ["number", "null"]
+        nightCharge:
+          type: ["number", "null"]
+        workingDays:
+          type: array
+          items:
+            type: string
+        workingHoursStart:
+          type: ["string", "null"]
+        workingHoursEnd:
+          type: ["string", "null"]
+        emergencyAvailable:
+          type: boolean
+        vacationMode:
+          type: boolean
+        maxDailyBookings:
+          type: ["integer", "null"]
+        serviceRadius:
+          type: ["integer", "null"]
+        serviceCity:
+          type: ["string", "null"]
+        pinCode:
+          type: ["string", "null"]
+        gender:
+          type: ["string", "null"]
+        dateOfBirth:
+          type: ["string", "null"]
 
     TechnicianInput:
       type: object
@@ -675,6 +754,68 @@ components:
           type: array
           items:
             type: integer
+        profession:
+          type: array
+          items:
+            type: string
+        servicesOffered:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        yearsExperience:
+          type: integer
+        certifications:
+          type: array
+          items:
+            type: string
+        previousCompany:
+          type: string
+        areasOfExpertise:
+          type: array
+          items:
+            type: string
+        languagesSpoken:
+          type: array
+          items:
+            type: string
+        visitCharge:
+          type: number
+        perJobRate:
+          type: number
+        inspectionCharge:
+          type: number
+        emergencyCharge:
+          type: number
+        weekendCharge:
+          type: number
+        nightCharge:
+          type: number
+        workingDays:
+          type: array
+          items:
+            type: string
+        workingHoursStart:
+          type: string
+        workingHoursEnd:
+          type: string
+        emergencyAvailable:
+          type: boolean
+        vacationMode:
+          type: boolean
+        maxDailyBookings:
+          type: integer
+        serviceRadius:
+          type: integer
+        serviceCity:
+          type: string
+        pinCode:
+          type: string
+        gender:
+          type: string
+        dateOfBirth:
+          type: string
 
     TechnicianUpdate:
       type: object
@@ -695,6 +836,70 @@ components:
           type: array
           items:
             type: integer
+        avatarUrl:
+          type: string
+        profession:
+          type: array
+          items:
+            type: string
+        servicesOffered:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        yearsExperience:
+          type: integer
+        certifications:
+          type: array
+          items:
+            type: string
+        previousCompany:
+          type: string
+        areasOfExpertise:
+          type: array
+          items:
+            type: string
+        languagesSpoken:
+          type: array
+          items:
+            type: string
+        visitCharge:
+          type: number
+        perJobRate:
+          type: number
+        inspectionCharge:
+          type: number
+        emergencyCharge:
+          type: number
+        weekendCharge:
+          type: number
+        nightCharge:
+          type: number
+        workingDays:
+          type: array
+          items:
+            type: string
+        workingHoursStart:
+          type: string
+        workingHoursEnd:
+          type: string
+        emergencyAvailable:
+          type: boolean
+        vacationMode:
+          type: boolean
+        maxDailyBookings:
+          type: integer
+        serviceRadius:
+          type: integer
+        serviceCity:
+          type: string
+        pinCode:
+          type: string
+        gender:
+          type: string
+        dateOfBirth:
+          type: string
 
     # Booking
     Booking:

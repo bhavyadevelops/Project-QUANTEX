@@ -5,6 +5,7 @@
  * QUANTEX API - AI-powered technician booking platform
  * OpenAPI spec version: 0.1.0
  */
+import type { TechnicianInputServicesOffered } from './technicianInputServicesOffered';
 
 export interface TechnicianInput {
   bio?: string;
@@ -12,4 +13,28 @@ export interface TechnicianInput {
   hourlyRate: number;
   responseTime: string;
   categoryIds?: number[];
+  profession?: string[];
+  servicesOffered?: TechnicianInputServicesOffered;
+  yearsExperience?: number;
+  certifications?: string[];
+  previousCompany?: string;
+  areasOfExpertise?: string[];
+  languagesSpoken?: string[];
+  visitCharge?: number;
+  perJobRate?: number;
+  inspectionCharge?: number;
+  emergencyCharge?: number;
+  weekendCharge?: number;
+  nightCharge?: number;
+  workingDays?: string[];
+  workingHoursStart?: string;
+  workingHoursEnd?: string;
+  emergencyAvailable?: boolean;
+  vacationMode?: boolean;
+  maxDailyBookings?: number;
+  serviceRadius?: number;
+  serviceCity?: string;
+  pinCode?: string;
+  gender?: string;
+  dateOfBirth?: string;
 }
