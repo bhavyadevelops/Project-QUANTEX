@@ -5,9 +5,59 @@
  * QUANTEX API - AI-powered technician booking platform
  * OpenAPI spec version: 0.1.0
  */
+import type { ListTechniciansSortBy } from './listTechniciansSortBy';
+import type { TechnicianStatus } from './technicianStatus';
 
 export type ListTechniciansParams = {
+/**
+ * Full-text search across name, bio, skills, profession, and services
+ */
+search?: string;
 categoryId?: number;
 available?: boolean;
+/**
+ * Filter by availability (alias for available)
+ */
+isAvailable?: boolean;
+/**
+ * Only return technicians with verification badges
+ */
+verified?: boolean;
+/**
+ * Minimum rating (inclusive)
+ */
+minRating?: number;
+/**
+ * Maximum hourly rate (inclusive)
+ */
+maxRate?: number;
+/**
+ * Filter by current status
+ */
+currentStatus?: TechnicianStatus;
+/**
+ * Only return technicians with emergency service available
+ */
+emergencyAvailable?: boolean;
+/**
+ * Minimum years of experience (inclusive)
+ */
+minExperience?: number;
+/**
+ * Customer latitude (decimal degrees) for distance calculations
+ */
+lat?: number;
+/**
+ * Customer longitude (decimal degrees) for distance calculations
+ */
+lng?: number;
+/**
+ * Maximum distance in km from customer location (requires lat+lng)
+ */
+radius?: number;
+/**
+ * Sort order
+ */
+sortBy?: ListTechniciansSortBy;
 limit?: number;
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,13 +41,18 @@ type Step = "category" | "technician" | "details" | "confirm";
 const STEPS: Step[] = ["category", "technician", "details", "confirm"];
 
 export default function BookTechnician() {
-  const [_, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { t } = useLanguage();
-  const [step, setStep] = useState<Step>("category");
+  const { toast } = useToast();
+
+  // Read preselected technicianId from URL query params (?technicianId=N)
+  const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const preselectedTechId = Number(urlParams.get("technicianId") ?? "0") || 0;
+
+  const [step, setStep] = useState<Step>(preselectedTechId > 0 ? "technician" : "category");
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const [analyzeLoading, setAnalyzeLoading] = useState(false);
   const [expandedTechId, setExpandedTechId] = useState<number | null>(null);
-  const { toast } = useToast();
 
   const { data: categories, isLoading: catsLoading } = useListServiceCategories();
   const { data: allTechs, isLoading: techsLoading } = useListTechnicians();
@@ -56,8 +61,20 @@ export default function BookTechnician() {
 
   const form = useForm<z.infer<typeof bookSchema>>({
     resolver: zodResolver(bookSchema),
-    defaultValues: { categoryId: 0, technicianId: 0, issueDescription: "", address: "", scheduledAt: "" },
+    defaultValues: { categoryId: 0, technicianId: preselectedTechId, issueDescription: "", address: "", scheduledAt: "" },
   });
+  const _ = location;
+
+  // When arriving with ?technicianId=N, auto-set categoryId from the tech's first category once techs load
+  useEffect(() => {
+    if (preselectedTechId <= 0 || !allTechs) return;
+    const tech = allTechs.find(t => t.id === preselectedTechId);
+    if (!tech) return;
+    const firstCatId = tech.categoryIds?.[0] ?? 0;
+    if (firstCatId > 0 && form.getValues("categoryId") === 0) {
+      form.setValue("categoryId", firstCatId);
+    }
+  }, [allTechs, preselectedTechId, form]);
 
   const selectedCatId  = form.watch("categoryId");
   const selectedTechId = form.watch("technicianId");

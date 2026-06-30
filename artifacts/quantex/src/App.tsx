@@ -28,6 +28,8 @@ import TechnicianDashboard from "@/pages/technician/dashboard";
 import TechnicianBookings from "@/pages/technician/bookings";
 import TechnicianOnboarding from "@/pages/technician/onboarding";
 import Analytics from "@/pages/analytics";
+import Marketplace from "@/pages/marketplace";
+import TechnicianDetail from "@/pages/technician-detail";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -75,6 +77,8 @@ function Router() {
       <Route path="/analytics">
         <ProtectedRoute allowedRoles={["customer", "technician"]}><Analytics /></ProtectedRoute>
       </Route>
+      <Route path="/marketplace" component={Marketplace} />
+      <Route path="/technicians/:id" component={TechnicianDetail} />
 
       <Route component={NotFound} />
     </Switch>

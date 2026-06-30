@@ -25,6 +25,7 @@ export * from './listBookingsRole';
 export * from './listBookingsStatus';
 export * from './listReviewsParams';
 export * from './listTechniciansParams';
+export * from './listTechniciansSortBy';
 export * from './loginInput';
 export * from './messageResponse';
 export * from './registerInput';

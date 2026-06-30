@@ -9,7 +9,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarCheck, Zap, Star, Clock, ArrowRight, Loader2, AlertCircle, CheckCircle, XCircle, MapPin, DollarSign } from "lucide-react";
+import { CalendarCheck, Zap, Star, Clock, ArrowRight, Loader2, AlertCircle, CheckCircle, XCircle, MapPin, DollarSign, Users } from "lucide-react";
 
 const CANCELLABLE = new Set(["pending", "accepted"]);
 
@@ -184,6 +184,7 @@ export default function CustomerDashboard() {
             </div>
             <div className="p-5 flex flex-col gap-3">
               {[
+                { href: "/marketplace",  icon: <Users className="w-4 h-4 mr-2 text-primary" />,        label: t("nav_marketplace") },
                 { href: "/book",         icon: <Zap className="w-4 h-4 mr-2 text-primary" />,          label: t("dash_act_book") },
                 { href: "/ai-assistant", icon: <Star className="w-4 h-4 mr-2 text-primary" />,         label: t("dash_act_ai") },
                 { href: "/history",      icon: <Clock className="w-4 h-4 mr-2 text-primary" />,        label: t("dash_act_history") },

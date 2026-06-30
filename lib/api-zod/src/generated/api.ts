@@ -141,11 +141,23 @@ export const ListServiceCategoriesResponse = zod.array(ListServiceCategoriesResp
 /**
  * @summary List technicians
  */
-export const listTechniciansQueryLimitDefault = 20;
+export const listTechniciansQueryLimitDefault = 50;
 
 export const ListTechniciansQueryParams = zod.object({
+  "search": zod.coerce.string().optional().describe('Full-text search across name, bio, skills, profession, and services'),
   "categoryId": zod.coerce.number().optional(),
   "available": zod.coerce.boolean().optional(),
+  "isAvailable": zod.coerce.boolean().optional().describe('Filter by availability (alias for available)'),
+  "verified": zod.coerce.boolean().optional().describe('Only return technicians with verification badges'),
+  "minRating": zod.coerce.number().optional().describe('Minimum rating (inclusive)'),
+  "maxRate": zod.coerce.number().optional().describe('Maximum hourly rate (inclusive)'),
+  "currentStatus": zod.enum(['online', 'offline', 'busy', 'on_break', 'emergency_only']).optional().describe('Filter by current status'),
+  "emergencyAvailable": zod.coerce.boolean().optional().describe('Only return technicians with emergency service available'),
+  "minExperience": zod.coerce.number().optional().describe('Minimum years of experience (inclusive)'),
+  "lat": zod.coerce.number().optional().describe('Customer latitude (decimal degrees) for distance calculations'),
+  "lng": zod.coerce.number().optional().describe('Customer longitude (decimal degrees) for distance calculations'),
+  "radius": zod.coerce.number().optional().describe('Maximum distance in km from customer location (requires lat+lng)'),
+  "sortBy": zod.enum(['highest_rated', 'lowest_price', 'most_experienced', 'fastest', 'nearest']).optional().describe('Sort order'),
   "limit": zod.coerce.number().default(listTechniciansQueryLimitDefault)
 })
 

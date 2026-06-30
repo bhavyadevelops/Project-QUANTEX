@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, Shield, Clock } from "lucide-react";
+import { ArrowRight, Zap, Shield, Clock, Users } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
 export default function Home() {
@@ -26,6 +26,11 @@ export default function Home() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="text-lg px-8 py-6 uppercase font-bold" asChild>
+                <Link href="/marketplace">
+                  <Users className="mr-2 w-5 h-5" /> {t("nav_marketplace")}
+                </Link>
+              </Button>
+              <Button size="lg" variant="ghost" className="text-lg px-8 py-6 uppercase font-bold text-muted-foreground" asChild>
                 <Link href="/ai-assistant">{t("home_ai_btn")}</Link>
               </Button>
             </div>

@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, and } from "drizzle-orm";
+import { eq, and, gte, lte, ilike, or, desc, asc, sql } from "drizzle-orm";
 import { db, techniciansTable, usersTable, reviewsTable } from "@workspace/db";
 import {
   ListTechniciansQueryParams,
@@ -79,23 +79,162 @@ router.get("/technicians", async (req, res): Promise<void> => {
     return;
   }
 
-  let conditions = [];
-  if (query.data.available !== undefined) {
-    conditions.push(eq(techniciansTable.isAvailable, query.data.available));
+  const q = query.data;
+  const conditions: ReturnType<typeof eq>[] = [];
+
+  // Availability filter (support both `available` and `isAvailable`)
+  const availFilter = q.isAvailable ?? q.available;
+  if (availFilter !== undefined) {
+    conditions.push(eq(techniciansTable.isAvailable, availFilter));
+  }
+
+  // Status filter
+  if (q.currentStatus) {
+    conditions.push(eq(techniciansTable.currentStatus, q.currentStatus as any));
+  }
+
+  // Rating filter
+  if (q.minRating !== undefined) {
+    conditions.push(gte(techniciansTable.rating, q.minRating));
+  }
+
+  // Price filter
+  if (q.maxRate !== undefined) {
+    conditions.push(lte(techniciansTable.hourlyRate, q.maxRate));
+  }
+
+  // Category filter
+  if (q.categoryId !== undefined) {
+    conditions.push(sql`${techniciansTable.categoryIds} @> ARRAY[${q.categoryId}]::integer[]` as any);
+  }
+
+  // Verified filter (has at least one verification badge)
+  if (q.verified) {
+    conditions.push(sql`jsonb_array_length(${techniciansTable.verificationBadges}::jsonb) > 0` as any);
+  }
+
+  // Emergency available filter
+  if (q.emergencyAvailable) {
+    conditions.push(eq(techniciansTable.emergencyAvailable, true));
+  }
+
+  // Minimum experience filter
+  if (q.minExperience !== undefined) {
+    conditions.push(gte(techniciansTable.yearsExperience, q.minExperience));
+  }
+
+  // Search filter: across user name, bio, skills, profession, areas of expertise, city, and servicesOffered JSON
+  let searchCondition: any = undefined;
+  if (q.search && q.search.trim().length > 0) {
+    const term = `%${q.search.trim()}%`;
+    searchCondition = or(
+      ilike(usersTable.name, term),
+      ilike(techniciansTable.bio, term),
+      sql`EXISTS (SELECT 1 FROM unnest(${techniciansTable.skills}) s WHERE s ILIKE ${term})`,
+      sql`EXISTS (SELECT 1 FROM unnest(${techniciansTable.profession}) p WHERE p ILIKE ${term})`,
+      sql`EXISTS (SELECT 1 FROM unnest(${techniciansTable.areasOfExpertise}) ae WHERE ae ILIKE ${term})`,
+      ilike(techniciansTable.serviceCity, term),
+      sql`${techniciansTable.servicesOffered}::text ILIKE ${term}`,
+    );
+  }
+
+  // Haversine helpers — defined before whereClause so radius filter can use them
+  const hasLocation = q.lat !== undefined && q.lng !== undefined;
+
+  const haversineKm = (lat: number, lng: number) => sql<number>`
+    CASE
+      WHEN ${techniciansTable.latitude} IS NOT NULL AND ${techniciansTable.longitude} IS NOT NULL
+      THEN (
+        6371 * acos(
+          LEAST(1.0, GREATEST(-1.0,
+            cos(radians(${lat})) * cos(radians(${techniciansTable.latitude}))
+            * cos(radians(${techniciansTable.longitude}) - radians(${lng}))
+            + sin(radians(${lat})) * sin(radians(${techniciansTable.latitude}))
+          ))
+        )
+      )
+      ELSE NULL
+    END
+  `;
+
+  // Distance radius filter — pushed into conditions BEFORE whereClause is built
+  if (hasLocation && q.radius !== undefined) {
+    conditions.push(sql`
+      ${techniciansTable.latitude} IS NOT NULL
+      AND ${techniciansTable.longitude} IS NOT NULL
+      AND (
+        6371 * acos(
+          LEAST(1.0, GREATEST(-1.0,
+            cos(radians(${q.lat!})) * cos(radians(${techniciansTable.latitude}))
+            * cos(radians(${techniciansTable.longitude}) - radians(${q.lng!}))
+            + sin(radians(${q.lat!})) * sin(radians(${techniciansTable.latitude}))
+          ))
+        )
+      ) <= ${q.radius}
+    ` as any);
+  }
+
+  const whereClause = conditions.length > 0 && searchCondition
+    ? and(...conditions, searchCondition)
+    : conditions.length > 0
+      ? and(...conditions)
+      : searchCondition ?? undefined;
+
+  // Build sort order
+  let orderBy: any[] = [];
+  switch (q.sortBy) {
+    case "highest_rated":
+      orderBy = [desc(techniciansTable.rating)];
+      break;
+    case "lowest_price":
+      orderBy = [asc(techniciansTable.hourlyRate)];
+      break;
+    case "most_experienced":
+      orderBy = [desc(techniciansTable.yearsExperience), desc(techniciansTable.completedJobs)];
+      break;
+    case "fastest":
+      orderBy = [desc(techniciansTable.completedJobs), desc(techniciansTable.rating)];
+      break;
+    case "nearest":
+      if (hasLocation) {
+        // True distance sort: technicians with no coordinates sink to end
+        orderBy = [
+          sql`CASE WHEN ${techniciansTable.latitude} IS NOT NULL AND ${techniciansTable.longitude} IS NOT NULL THEN 0 ELSE 1 END`,
+          sql`${haversineKm(q.lat!, q.lng!)} ASC NULLS LAST`,
+        ];
+      } else {
+        // No location provided — fall back to highest rated
+        orderBy = [desc(techniciansTable.rating)];
+      }
+      break;
+    default:
+      orderBy = [desc(techniciansTable.rating)];
   }
 
   const rows = await db
     .select()
     .from(techniciansTable)
     .innerJoin(usersTable, eq(techniciansTable.userId, usersTable.id))
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .limit(query.data.limit ?? 20);
+    .where(whereClause)
+    .orderBy(...orderBy)
+    .limit(q.limit ?? 50);
 
-  res.json(rows.map(({ technicians: t, users: u }) => ({
-    ...publicTechRow(t),
-    name: u.name,
-    distance: Math.round(Math.random() * 10 * 10) / 10,
-  })));
+  res.json(rows.map(({ technicians: t, users: u }) => {
+    const distance = (hasLocation && t.latitude && t.longitude)
+      ? Math.round(
+          6371 * Math.acos(Math.min(1, Math.max(-1,
+            Math.cos(q.lat! * Math.PI / 180) * Math.cos((t.latitude as number) * Math.PI / 180)
+            * Math.cos(((t.longitude as number) - q.lng!) * Math.PI / 180)
+            + Math.sin(q.lat! * Math.PI / 180) * Math.sin((t.latitude as number) * Math.PI / 180)
+          ))) * 10
+        ) / 10
+      : null;
+    return {
+      ...publicTechRow(t),
+      name: u.name,
+      distance,
+    };
+  }));
 });
 
 router.get("/technicians/me", async (req, res): Promise<void> => {

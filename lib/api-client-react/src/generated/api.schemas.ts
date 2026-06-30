@@ -448,10 +448,69 @@ export interface AnalyticsSummary {
 }
 
 export type ListTechniciansParams = {
+/**
+ * Full-text search across name, bio, skills, profession, and services
+ */
+search?: string;
 categoryId?: number;
 available?: boolean;
+/**
+ * Filter by availability (alias for available)
+ */
+isAvailable?: boolean;
+/**
+ * Only return technicians with verification badges
+ */
+verified?: boolean;
+/**
+ * Minimum rating (inclusive)
+ */
+minRating?: number;
+/**
+ * Maximum hourly rate (inclusive)
+ */
+maxRate?: number;
+/**
+ * Filter by current status
+ */
+currentStatus?: TechnicianStatus;
+/**
+ * Only return technicians with emergency service available
+ */
+emergencyAvailable?: boolean;
+/**
+ * Minimum years of experience (inclusive)
+ */
+minExperience?: number;
+/**
+ * Customer latitude (decimal degrees) for distance calculations
+ */
+lat?: number;
+/**
+ * Customer longitude (decimal degrees) for distance calculations
+ */
+lng?: number;
+/**
+ * Maximum distance in km from customer location (requires lat+lng)
+ */
+radius?: number;
+/**
+ * Sort order
+ */
+sortBy?: ListTechniciansSortBy;
 limit?: number;
 };
+
+export type ListTechniciansSortBy = typeof ListTechniciansSortBy[keyof typeof ListTechniciansSortBy];
+
+
+export const ListTechniciansSortBy = {
+  highest_rated: 'highest_rated',
+  lowest_price: 'lowest_price',
+  most_experienced: 'most_experienced',
+  fastest: 'fastest',
+  nearest: 'nearest',
+} as const;
 
 export type ListBookingsParams = {
 status?: ListBookingsStatus;
