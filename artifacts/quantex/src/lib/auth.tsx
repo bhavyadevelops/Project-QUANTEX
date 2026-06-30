@@ -17,13 +17,14 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<User | null>(null);
+  const [hasToken] = useState(() => !!getStoredToken());
   const queryClient = useQueryClient();
 
-  const { data: meData, isLoading } = useGetMe({
+  const { data: meData, isLoading, isError } = useGetMe({
     query: {
       retry: false,
       refetchOnWindowFocus: false,
-      enabled: !!getStoredToken(),
+      enabled: hasToken,
     } as any
   });
 
@@ -32,6 +33,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUserState(meData);
     }
   }, [meData]);
+
+  useEffect(() => {
+    if (isError) {
+      clearToken();
+      setUserState(null);
+      queryClient.setQueryData(getGetMeQueryKey(), null);
+      sessionStorage.setItem("quantex_auth_message", "Your session has expired. Please log in again.");
+    }
+  }, [isError, queryClient]);
 
   const setUser = (newUser: User | null, token?: string) => {
     setUserState(newUser);

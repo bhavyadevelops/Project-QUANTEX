@@ -6,9 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { TechnicianInputServicesOffered } from './technicianInputServicesOffered';
+import type { TechnicianStatus } from './technicianStatus';
 
 export interface TechnicianInput {
   bio?: string;
+  profilePictureUrl?: string;
+  currentStatus?: TechnicianStatus;
+  verificationBadges?: string[];
   skills: string[];
   hourlyRate: number;
   responseTime: string;
@@ -33,6 +37,8 @@ export interface TechnicianInput {
   vacationMode?: boolean;
   maxDailyBookings?: number;
   serviceRadius?: number;
+  latitude?: number;
+  longitude?: number;
   serviceCity?: string;
   pinCode?: string;
   gender?: string;

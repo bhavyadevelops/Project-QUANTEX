@@ -22,10 +22,16 @@ const registerSchema = z.object({
 
 export default function Register() {
   const [_, setLocation] = useLocation();
-  const { setUser } = useAuth();
+  const { setUser, user, isLoading } = useAuth();
   const { toast } = useToast();
   const { t } = useLanguage();
   const registerMutation = useRegister();
+
+  React.useEffect(() => {
+    if (!isLoading && user) {
+      setLocation(user.role === "technician" ? "/technician/dashboard" : "/dashboard");
+    }
+  }, [user, isLoading, setLocation]);
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),

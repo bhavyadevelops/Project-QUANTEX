@@ -39,6 +39,7 @@ export * from './technicianDashboard';
 export * from './technicianInput';
 export * from './technicianInputServicesOffered';
 export * from './technicianServicesOffered';
+export * from './technicianStatus';
 export * from './technicianUpdate';
 export * from './technicianUpdateServicesOffered';
 export * from './trackingInfo';

@@ -1,13 +1,22 @@
-import { pgTable, text, serial, integer, boolean, real, timestamp, jsonb, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, real, timestamp, jsonb, unique, index, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { usersTable } from "./users";
+
+export const technicianStatusEnum = pgEnum("technician_status", [
+  "online",
+  "offline",
+  "busy",
+  "on_break",
+  "emergency_only",
+]);
 
 export const techniciansTable = pgTable("technicians", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   bio: text("bio"),
   avatarUrl: text("avatar_url"),
+  profilePictureUrl: text("profile_picture_url"),
   skills: text("skills").array().notNull().default([]),
   rating: real("rating").notNull().default(0),
   reviewCount: integer("review_count").notNull().default(0),
@@ -40,8 +49,13 @@ export const techniciansTable = pgTable("technicians", {
   maxDailyBookings: integer("max_daily_bookings"),
   serviceRadius: integer("service_radius"),
   // Location
+  latitude: real("latitude"),
+  longitude: real("longitude"),
   serviceCity: text("service_city"),
   pinCode: text("pin_code"),
+  // Status & badges
+  currentStatus: technicianStatusEnum("current_status").notNull().default("offline"),
+  verificationBadges: jsonb("verification_badges").$type<string[]>().notNull().default([]),
   // Personal (owner-only fields — never exposed on public list/detail endpoints)
   gender: text("gender"),
   dateOfBirth: text("date_of_birth"),
@@ -49,6 +63,8 @@ export const techniciansTable = pgTable("technicians", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 }, (t) => [
   unique("technicians_user_id_unique").on(t.userId),
+  index("technicians_user_id_idx").on(t.userId),
+  index("technicians_is_available_idx").on(t.isAvailable),
 ]);
 
 export const insertTechnicianSchema = createInsertSchema(techniciansTable).omit({ id: true, createdAt: true, updatedAt: true });

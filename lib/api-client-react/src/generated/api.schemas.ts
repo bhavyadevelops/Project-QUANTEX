@@ -81,6 +81,17 @@ export interface ServiceCategory {
   description: string;
 }
 
+export type TechnicianStatus = typeof TechnicianStatus[keyof typeof TechnicianStatus];
+
+
+export const TechnicianStatus = {
+  online: 'online',
+  offline: 'offline',
+  busy: 'busy',
+  on_break: 'on_break',
+  emergency_only: 'emergency_only',
+} as const;
+
 export type TechnicianServicesOffered = {[key: string]: string[]};
 
 export interface Technician {
@@ -91,6 +102,8 @@ export interface Technician {
   bio?: string | null;
   /** @nullable */
   avatarUrl?: string | null;
+  /** @nullable */
+  profilePictureUrl?: string | null;
   skills: string[];
   rating: number;
   reviewCount: number;
@@ -100,6 +113,12 @@ export interface Technician {
   responseTime: string;
   /** @nullable */
   distance?: number | null;
+  /** @nullable */
+  latitude?: number | null;
+  /** @nullable */
+  longitude?: number | null;
+  currentStatus?: TechnicianStatus;
+  verificationBadges?: string[];
   categoryIds?: number[];
   profession?: string[];
   servicesOffered?: TechnicianServicesOffered;
@@ -147,6 +166,9 @@ export type TechnicianInputServicesOffered = {[key: string]: string[]};
 
 export interface TechnicianInput {
   bio?: string;
+  profilePictureUrl?: string;
+  currentStatus?: TechnicianStatus;
+  verificationBadges?: string[];
   skills: string[];
   hourlyRate: number;
   responseTime: string;
@@ -171,6 +193,8 @@ export interface TechnicianInput {
   vacationMode?: boolean;
   maxDailyBookings?: number;
   serviceRadius?: number;
+  latitude?: number;
+  longitude?: number;
   serviceCity?: string;
   pinCode?: string;
   gender?: string;
@@ -181,12 +205,17 @@ export type TechnicianUpdateServicesOffered = {[key: string]: string[]};
 
 export interface TechnicianUpdate {
   bio?: string;
+  profilePictureUrl?: string;
   skills?: string[];
   hourlyRate?: number;
   responseTime?: string;
   isAvailable?: boolean;
+  currentStatus?: TechnicianStatus;
   categoryIds?: number[];
   avatarUrl?: string;
+  verificationBadges?: string[];
+  latitude?: number;
+  longitude?: number;
   profession?: string[];
   servicesOffered?: TechnicianUpdateServicesOffered;
   yearsExperience?: number;

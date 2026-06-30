@@ -18,10 +18,24 @@ const loginSchema = z.object({
 
 export default function Login() {
   const [_, setLocation] = useLocation();
-  const { setUser } = useAuth();
+  const { setUser, user, isLoading } = useAuth();
   const { toast } = useToast();
   const { t } = useLanguage();
   const loginMutation = useLogin();
+
+  React.useEffect(() => {
+    const msg = sessionStorage.getItem("quantex_auth_message");
+    if (msg) {
+      sessionStorage.removeItem("quantex_auth_message");
+      toast({ title: "Session Expired", description: msg, variant: "destructive" });
+    }
+  }, [toast]);
+
+  React.useEffect(() => {
+    if (!isLoading && user) {
+      setLocation(user.role === "technician" ? "/technician/dashboard" : "/dashboard");
+    }
+  }, [user, isLoading, setLocation]);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),

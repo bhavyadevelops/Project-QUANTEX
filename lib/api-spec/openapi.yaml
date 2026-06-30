@@ -637,6 +637,10 @@ components:
           type: string
 
     # Technician
+    TechnicianStatus:
+      type: string
+      enum: [online, offline, busy, on_break, emergency_only]
+
     Technician:
       type: object
       required: [id, userId, name, skills, rating, reviewCount, isAvailable, completedJobs, hourlyRate, responseTime]
@@ -650,6 +654,8 @@ components:
         bio:
           type: ["string", "null"]
         avatarUrl:
+          type: ["string", "null"]
+        profilePictureUrl:
           type: ["string", "null"]
         skills:
           type: array
@@ -669,6 +675,16 @@ components:
           type: string
         distance:
           type: ["number", "null"]
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        currentStatus:
+          $ref: "#/components/schemas/TechnicianStatus"
+        verificationBadges:
+          type: array
+          items:
+            type: string
         categoryIds:
           type: array
           items:
@@ -742,6 +758,14 @@ components:
       properties:
         bio:
           type: string
+        profilePictureUrl:
+          type: string
+        currentStatus:
+          $ref: "#/components/schemas/TechnicianStatus"
+        verificationBadges:
+          type: array
+          items:
+            type: string
         skills:
           type: array
           items:
@@ -808,6 +832,10 @@ components:
           type: integer
         serviceRadius:
           type: integer
+        latitude:
+          type: number
+        longitude:
+          type: number
         serviceCity:
           type: string
         pinCode:
@@ -822,6 +850,8 @@ components:
       properties:
         bio:
           type: string
+        profilePictureUrl:
+          type: string
         skills:
           type: array
           items:
@@ -832,12 +862,22 @@ components:
           type: string
         isAvailable:
           type: boolean
+        currentStatus:
+          $ref: "#/components/schemas/TechnicianStatus"
         categoryIds:
           type: array
           items:
             type: integer
         avatarUrl:
           type: string
+        verificationBadges:
+          type: array
+          items:
+            type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
         profession:
           type: array
           items:

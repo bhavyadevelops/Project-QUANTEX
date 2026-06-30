@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { TechnicianServicesOffered } from './technicianServicesOffered';
+import type { TechnicianStatus } from './technicianStatus';
 
 export interface Technician {
   id: number;
@@ -15,6 +16,8 @@ export interface Technician {
   bio?: string | null;
   /** @nullable */
   avatarUrl?: string | null;
+  /** @nullable */
+  profilePictureUrl?: string | null;
   skills: string[];
   rating: number;
   reviewCount: number;
@@ -24,6 +27,12 @@ export interface Technician {
   responseTime: string;
   /** @nullable */
   distance?: number | null;
+  /** @nullable */
+  latitude?: number | null;
+  /** @nullable */
+  longitude?: number | null;
+  currentStatus?: TechnicianStatus;
+  verificationBadges?: string[];
   categoryIds?: number[];
   profession?: string[];
   servicesOffered?: TechnicianServicesOffered;
