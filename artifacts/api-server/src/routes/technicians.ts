@@ -116,13 +116,38 @@ router.post("/technicians", async (req, res): Promise<void> => {
     return;
   }
 
+  const d = body.data;
   const [technician] = await db.insert(techniciansTable).values({
     userId: user.id,
-    bio: body.data.bio ?? null,
-    skills: body.data.skills,
-    hourlyRate: body.data.hourlyRate,
-    responseTime: body.data.responseTime,
-    categoryIds: body.data.categoryIds ?? [],
+    bio: d.bio ?? null,
+    skills: d.skills ?? [],
+    hourlyRate: d.hourlyRate ?? 0,
+    responseTime: d.responseTime ?? "30 min",
+    categoryIds: d.categoryIds ?? [],
+    profession: d.profession ?? [],
+    servicesOffered: (d.servicesOffered as Record<string, string[]> | undefined) ?? {},
+    yearsExperience: d.yearsExperience ?? null,
+    certifications: d.certifications ?? [],
+    previousCompany: d.previousCompany ?? null,
+    areasOfExpertise: d.areasOfExpertise ?? [],
+    languagesSpoken: d.languagesSpoken ?? [],
+    visitCharge: d.visitCharge ?? null,
+    perJobRate: d.perJobRate ?? null,
+    inspectionCharge: d.inspectionCharge ?? null,
+    emergencyCharge: d.emergencyCharge ?? null,
+    weekendCharge: d.weekendCharge ?? null,
+    nightCharge: d.nightCharge ?? null,
+    workingDays: d.workingDays ?? [],
+    workingHoursStart: d.workingHoursStart ?? null,
+    workingHoursEnd: d.workingHoursEnd ?? null,
+    emergencyAvailable: d.emergencyAvailable ?? false,
+    vacationMode: d.vacationMode ?? false,
+    maxDailyBookings: d.maxDailyBookings ?? null,
+    serviceRadius: d.serviceRadius ?? null,
+    serviceCity: d.serviceCity ?? null,
+    pinCode: d.pinCode ?? null,
+    gender: d.gender ?? null,
+    dateOfBirth: d.dateOfBirth ?? null,
   }).returning();
 
   res.status(201).json({
@@ -164,6 +189,22 @@ router.patch("/technicians/:id", async (req, res): Promise<void> => {
   const params = UpdateTechnicianParams.safeParse({ id: req.params.id });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  // Verify ownership: the authenticated user must own this technician profile
+  const [existing] = await db
+    .select({ userId: techniciansTable.userId })
+    .from(techniciansTable)
+    .where(eq(techniciansTable.id, params.data.id));
+
+  if (!existing) {
+    res.status(404).json({ error: "Technician not found" });
+    return;
+  }
+
+  if (existing.userId !== user.id) {
+    res.status(403).json({ error: "Forbidden" });
     return;
   }
 

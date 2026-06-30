@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { TechnicianProfileCard } from "@/components/technician-profile-card";
 import { useToast } from "@/hooks/use-toast";
 import {
   CheckCircle,
@@ -17,27 +18,84 @@ import {
   Loader2,
   User,
   Briefcase,
+  Wrench,
   DollarSign,
   Clock,
   MapPin,
   Eye,
-  Star,
   Zap,
-  Shield,
+  PlusCircle,
+  X,
 } from "lucide-react";
 
+const PROFESSIONS = [
+  "Electrician",
+  "Plumber",
+  "HVAC Technician",
+  "Appliance Repair",
+  "Computer Technician",
+  "Network Engineer",
+  "Security Specialist",
+  "Solar Technician",
+  "General Handyman",
+  "Carpenter",
+  "Painter",
+  "Locksmith",
+  "Welder",
+  "Roofer",
+  "Flooring Specialist",
+  "Tiler",
+  "Window & Door Specialist",
+  "Cleaning Specialist",
+  "Pest Control",
+  "Landscaper",
+  "Pool Technician",
+  "Elevator Technician",
+  "Fire Safety Technician",
+  "Smart Home Specialist",
+];
+
+const PROFESSION_SERVICES: Record<string, string[]> = {
+  "Electrician": ["Wiring & Rewiring", "Panel Upgrades", "Outlet Installation", "Lighting Installation", "EV Charger Install", "Generator Setup", "Electrical Inspection"],
+  "Plumber": ["Pipe Repair", "Leak Detection", "Water Heater Install", "Drain Cleaning", "Sewer Line Repair", "Fixture Installation", "Water Softener Install"],
+  "HVAC Technician": ["AC Installation", "AC Repair", "Furnace Service", "Duct Cleaning", "Thermostat Install", "Air Quality Testing", "Heat Pump Service"],
+  "Appliance Repair": ["Washer / Dryer Repair", "Refrigerator Repair", "Dishwasher Repair", "Oven / Range Repair", "Microwave Repair", "Freezer Repair"],
+  "Computer Technician": ["Hardware Repair", "OS Installation", "Virus Removal", "Data Recovery", "Laptop Screen Repair", "Memory Upgrade", "SSD Installation"],
+  "Network Engineer": ["WiFi Setup", "Router Config", "LAN Cabling", "Network Troubleshooting", "VPN Setup", "Firewall Config", "Home Office Setup"],
+  "Security Specialist": ["CCTV Installation", "Alarm System Setup", "Access Control", "Smart Lock Install", "Security Audit", "Intercom Install"],
+  "Solar Technician": ["Solar Panel Install", "Inverter Setup", "Battery Storage", "Solar Audit", "System Monitoring", "Panel Cleaning"],
+  "General Handyman": ["Furniture Assembly", "TV Mounting", "Curtain Installation", "Minor Plumbing", "Minor Electrical", "Shelf Install", "Patch & Paint"],
+  "Carpenter": ["Custom Cabinets", "Door Installation", "Deck Building", "Wood Repair", "Trim Work", "Furniture Repair", "Framing"],
+  "Painter": ["Interior Painting", "Exterior Painting", "Cabinet Painting", "Wallpaper Install", "Texture Finish", "Deck Staining", "Epoxy Flooring"],
+  "Locksmith": ["Lock Install", "Lock Rekey", "Safe Opening", "Key Duplication", "Emergency Lockout", "Master Key Setup"],
+  "Welder": ["MIG Welding", "TIG Welding", "Structural Welding", "Pipe Welding", "Metal Fabrication", "Repair Welding"],
+  "Roofer": ["Roof Inspection", "Shingle Replacement", "Flat Roof Repair", "Gutter Install", "Flashing Repair", "Emergency Tarp"],
+  "Flooring Specialist": ["Hardwood Install", "Tile Install", "Laminate Install", "Carpet Fitting", "Subfloor Repair", "Floor Refinishing"],
+  "Tiler": ["Bathroom Tiling", "Kitchen Backsplash", "Floor Tiling", "Tile Repair", "Grout Cleaning", "Mosaic Work"],
+  "Window & Door Specialist": ["Window Install", "Door Install", "Weatherstripping", "Glass Replacement", "Screen Repair", "Sliding Door Repair"],
+  "Cleaning Specialist": ["Deep Cleaning", "Move-in/out Cleaning", "Carpet Steam Clean", "Pressure Washing", "Window Cleaning", "Post-construction Cleaning"],
+  "Pest Control": ["Inspection", "Ant Treatment", "Roach Treatment", "Rodent Control", "Termite Treatment", "Bed Bug Treatment", "Mosquito Control"],
+  "Landscaper": ["Lawn Mowing", "Hedge Trimming", "Garden Design", "Irrigation Install", "Tree Trimming", "Mulching", "Lawn Aeration"],
+  "Pool Technician": ["Pool Cleaning", "Water Chemistry", "Pump Repair", "Filter Service", "Heater Repair", "Pool Opening/Closing"],
+  "Elevator Technician": ["Maintenance", "Repair", "Modernization", "Safety Inspection", "Emergency Service"],
+  "Fire Safety Technician": ["Fire Alarm Install", "Sprinkler Service", "Extinguisher Inspection", "Fire Safety Audit", "Suppression System"],
+  "Smart Home Specialist": ["Smart Hub Setup", "Voice Assistant Config", "Smart Lighting", "Smart Security", "Home Theater Setup", "Automation Programming"],
+};
+
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const LANGUAGES = ["English", "Hindi", "Gujarati", "French", "German", "Spanish", "Mandarin", "Arabic"];
+const LANGUAGES = ["English", "Hindi", "Gujarati", "French", "German", "Spanish", "Mandarin", "Arabic", "Portuguese", "Russian"];
 const GENDER_OPTIONS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 const STEP_LABELS = [
-  { icon: <User className="w-4 h-4" />, label: "PERSONAL" },
-  { icon: <Briefcase className="w-4 h-4" />, label: "EXPERTISE" },
-  { icon: <DollarSign className="w-4 h-4" />, label: "PRICING" },
-  { icon: <Clock className="w-4 h-4" />, label: "SCHEDULE" },
-  { icon: <MapPin className="w-4 h-4" />, label: "COVERAGE" },
-  { icon: <Eye className="w-4 h-4" />, label: "PREVIEW" },
+  { icon: <User className="w-4 h-4" />,       label: "PERSONAL" },
+  { icon: <Briefcase className="w-4 h-4" />,   label: "EXPERTISE" },
+  { icon: <Wrench className="w-4 h-4" />,      label: "SERVICES" },
+  { icon: <DollarSign className="w-4 h-4" />,  label: "PRICING" },
+  { icon: <Clock className="w-4 h-4" />,       label: "SCHEDULE" },
+  { icon: <MapPin className="w-4 h-4" />,      label: "COVERAGE" },
 ];
+
+type ServicesOffered = Record<string, string[]>;
 
 type WizardData = {
   gender: string;
@@ -50,6 +108,8 @@ type WizardData = {
   previousCompany: string;
   areasOfExpertise: string;
   skills: string;
+  servicesOffered: ServicesOffered;
+  customServices: Record<string, string>;
   hourlyRate: string;
   visitCharge: string;
   perJobRate: string;
@@ -61,6 +121,7 @@ type WizardData = {
   workingHoursStart: string;
   workingHoursEnd: string;
   emergencyAvailable: boolean;
+  vacationMode: boolean;
   maxDailyBookings: string;
   serviceCity: string;
   pinCode: string;
@@ -78,6 +139,8 @@ const DEFAULT: WizardData = {
   previousCompany: "",
   areasOfExpertise: "",
   skills: "",
+  servicesOffered: {},
+  customServices: {},
   hourlyRate: "",
   visitCharge: "",
   perJobRate: "",
@@ -89,21 +152,14 @@ const DEFAULT: WizardData = {
   workingHoursStart: "09:00",
   workingHoursEnd: "18:00",
   emergencyAvailable: false,
+  vacationMode: false,
   maxDailyBookings: "5",
   serviceCity: "",
   pinCode: "",
   serviceRadius: "20",
 };
 
-function ToggleChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
+function ToggleChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -136,6 +192,49 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ToggleSwitch({
+  checked,
+  onChange,
+  label,
+  description,
+  icon,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  description?: string;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`flex items-center gap-3 w-full border rounded-lg p-4 transition-colors ${
+        checked
+          ? "border-primary bg-primary/10"
+          : "border-border bg-background/50 hover:border-primary/40"
+      }`}
+    >
+      <span className={checked ? "text-primary" : "text-muted-foreground"}>{icon}</span>
+      <div className="text-left flex-1">
+        <p className={`font-mono text-sm font-bold uppercase ${checked ? "text-primary" : ""}`}>{label}</p>
+        {description && <p className="text-xs text-muted-foreground font-mono mt-0.5">{description}</p>}
+      </div>
+      <div
+        className={`w-10 h-6 rounded-full border-2 transition-colors relative ${
+          checked ? "bg-primary border-primary" : "bg-muted border-border"
+        }`}
+      >
+        <div
+          className={`absolute top-0.5 w-4 h-4 rounded-full transition-all ${
+            checked ? "left-5 bg-black" : "left-0.5 bg-muted-foreground"
+          }`}
+        />
+      </div>
+    </button>
+  );
+}
+
 export default function TechnicianOnboarding() {
   const [_, setLocation] = useLocation();
   const { user } = useAuth();
@@ -152,6 +251,7 @@ export default function TechnicianOnboarding() {
   useEffect(() => {
     if (existingProfile) {
       setTechnicianId(existingProfile.id);
+      const raw = existingProfile.servicesOffered as ServicesOffered | null;
       setData(prev => ({
         ...prev,
         gender: existingProfile.gender ?? "",
@@ -164,6 +264,7 @@ export default function TechnicianOnboarding() {
         previousCompany: existingProfile.previousCompany ?? "",
         areasOfExpertise: existingProfile.areasOfExpertise?.join(", ") ?? "",
         skills: existingProfile.skills?.join(", ") ?? "",
+        servicesOffered: raw && typeof raw === "object" ? raw : {},
         hourlyRate: existingProfile.hourlyRate?.toString() ?? "",
         visitCharge: existingProfile.visitCharge?.toString() ?? "",
         perJobRate: existingProfile.perJobRate?.toString() ?? "",
@@ -175,6 +276,7 @@ export default function TechnicianOnboarding() {
         workingHoursStart: existingProfile.workingHoursStart ?? "09:00",
         workingHoursEnd: existingProfile.workingHoursEnd ?? "18:00",
         emergencyAvailable: existingProfile.emergencyAvailable ?? false,
+        vacationMode: existingProfile.vacationMode ?? false,
         maxDailyBookings: existingProfile.maxDailyBookings?.toString() ?? "5",
         serviceCity: existingProfile.serviceCity ?? "",
         pinCode: existingProfile.pinCode ?? "",
@@ -195,37 +297,89 @@ export default function TechnicianOnboarding() {
         } catch {
         }
         setInitializing(false);
-      }, 1500);
+      }, 1200);
       return () => clearTimeout(timer);
     }
     return undefined;
   }, [existingProfile, initializing]);
 
-  const set = (key: keyof WizardData, value: WizardData[typeof key]) =>
+  const set = <K extends keyof WizardData>(key: K, value: WizardData[K]) =>
     setData(prev => ({ ...prev, [key]: value }));
 
   const toggleList = (key: "languagesSpoken" | "workingDays" | "profession", val: string) => {
     setData(prev => {
       const arr = prev[key] as string[];
+      return { ...prev, [key]: arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val] };
+    });
+  };
+
+  const toggleService = (profession: string, service: string) => {
+    setData(prev => {
+      const current = prev.servicesOffered[profession] ?? [];
+      const updated = current.includes(service)
+        ? current.filter(s => s !== service)
+        : [...current, service];
+      return { ...prev, servicesOffered: { ...prev.servicesOffered, [profession]: updated } };
+    });
+  };
+
+  const addCustomService = (profession: string) => {
+    const val = data.customServices[profession]?.trim();
+    if (!val) return;
+    setData(prev => {
+      const current = prev.servicesOffered[profession] ?? [];
       return {
         ...prev,
-        [key]: arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val],
+        servicesOffered: { ...prev.servicesOffered, [profession]: [...current, val] },
+        customServices: { ...prev.customServices, [profession]: "" },
       };
     });
   };
 
-  const parseNum = (v: string) => {
-    const n = parseFloat(v);
-    return isNaN(n) ? undefined : n;
-  };
+  const parseNum = (v: string) => { const n = parseFloat(v); return isNaN(n) ? undefined : n; };
+  const parseIntNum = (v: string) => { const n = parseInt(v, 10); return isNaN(n) ? undefined : n; };
+  const parseList = (v: string) => v.split(",").map(s => s.trim()).filter(Boolean);
 
-  const parseIntNum = (v: string) => {
-    const n = parseInt(v, 10);
-    return isNaN(n) ? undefined : n;
-  };
-
-  const parseList = (v: string) =>
-    v.split(",").map(s => s.trim()).filter(Boolean);
+  const buildPreviewTech = () => ({
+    id: technicianId ?? 0,
+    userId: user?.id ?? 0,
+    name: user?.name ?? "",
+    bio: data.bio || null,
+    avatarUrl: null,
+    skills: parseList(data.skills),
+    rating: 0,
+    reviewCount: 0,
+    isAvailable: !data.vacationMode,
+    completedJobs: 0,
+    hourlyRate: parseNum(data.hourlyRate) ?? 0,
+    responseTime: "30 min",
+    distance: null,
+    categoryIds: [],
+    profession: data.profession,
+    servicesOffered: data.servicesOffered,
+    yearsExperience: parseIntNum(data.yearsExperience) ?? null,
+    certifications: parseList(data.certifications),
+    previousCompany: data.previousCompany || null,
+    areasOfExpertise: parseList(data.areasOfExpertise),
+    languagesSpoken: data.languagesSpoken,
+    visitCharge: parseNum(data.visitCharge) ?? null,
+    perJobRate: parseNum(data.perJobRate) ?? null,
+    inspectionCharge: parseNum(data.inspectionCharge) ?? null,
+    emergencyCharge: parseNum(data.emergencyCharge) ?? null,
+    weekendCharge: parseNum(data.weekendCharge) ?? null,
+    nightCharge: parseNum(data.nightCharge) ?? null,
+    workingDays: data.workingDays,
+    workingHoursStart: data.workingHoursStart || null,
+    workingHoursEnd: data.workingHoursEnd || null,
+    emergencyAvailable: data.emergencyAvailable,
+    vacationMode: data.vacationMode,
+    maxDailyBookings: parseIntNum(data.maxDailyBookings) ?? null,
+    serviceRadius: parseIntNum(data.serviceRadius) ?? null,
+    serviceCity: data.serviceCity || null,
+    pinCode: data.pinCode || null,
+    gender: data.gender || null,
+    dateOfBirth: data.dateOfBirth || null,
+  });
 
   const handleFinish = async () => {
     if (!technicianId) return;
@@ -238,6 +392,7 @@ export default function TechnicianOnboarding() {
           hourlyRate: parseNum(data.hourlyRate) ?? 0,
           responseTime: "30 min",
           profession: data.profession,
+          servicesOffered: data.servicesOffered as Record<string, string[]>,
           yearsExperience: parseIntNum(data.yearsExperience),
           certifications: parseList(data.certifications),
           previousCompany: data.previousCompany || undefined,
@@ -253,10 +408,13 @@ export default function TechnicianOnboarding() {
           workingHoursStart: data.workingHoursStart || undefined,
           workingHoursEnd: data.workingHoursEnd || undefined,
           emergencyAvailable: data.emergencyAvailable,
+          vacationMode: data.vacationMode,
           maxDailyBookings: parseIntNum(data.maxDailyBookings),
           serviceCity: data.serviceCity || undefined,
           pinCode: data.pinCode || undefined,
           serviceRadius: parseIntNum(data.serviceRadius),
+          gender: data.gender || undefined,
+          dateOfBirth: data.dateOfBirth || undefined,
         },
       });
       toast({ title: "Profile Complete", description: "Your technician profile is live." });
@@ -277,6 +435,9 @@ export default function TechnicianOnboarding() {
     );
   }
 
+  const TOTAL_STEPS = STEP_LABELS.length;
+  const isLastStep = step === TOTAL_STEPS - 1;
+
   return (
     <div className="min-h-screen bg-background py-10">
       <div className="container mx-auto px-4 max-w-3xl">
@@ -284,10 +445,11 @@ export default function TechnicianOnboarding() {
           <p className="text-primary font-mono text-xs uppercase tracking-widest">TECHNICIAN PORTAL</p>
           <h1 className="text-3xl font-bold uppercase mt-1">PROFILE SETUP</h1>
           <p className="text-muted-foreground font-mono text-sm mt-1">
-            Complete your profile to start receiving jobs.
+            Complete your profile to start receiving jobs — {TOTAL_STEPS} steps total.
           </p>
         </div>
 
+        {/* Step progress */}
         <div className="flex items-center justify-between mb-8 overflow-x-auto pb-2">
           {STEP_LABELS.map((s, i) => (
             <React.Fragment key={i}>
@@ -320,9 +482,10 @@ export default function TechnicianOnboarding() {
           ))}
         </div>
 
-        <div className="border border-border bg-card rounded-lg p-6 relative overflow-hidden min-h-[400px]">
+        <div className="border border-border bg-card rounded-lg p-6 relative overflow-hidden min-h-[420px]">
           <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60" />
 
+          {/* Step 1: Personal */}
           {step === 0 && (
             <div className="space-y-5">
               <SectionHeading>Personal Information</SectionHeading>
@@ -365,16 +528,13 @@ export default function TechnicianOnboarding() {
             </div>
           )}
 
+          {/* Step 2: Expertise */}
           {step === 1 && (
             <div className="space-y-5">
               <SectionHeading>Professional Expertise</SectionHeading>
               <FieldRow label="Profession / Role (select all that apply)">
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    "Electrician", "Plumber", "HVAC Technician", "Appliance Repair",
-                    "Computer Technician", "Network Engineer", "Security Specialist",
-                    "Solar Technician", "General Handyman", "Carpenter",
-                  ].map(p => (
+                  {PROFESSIONS.map(p => (
                     <ToggleChip
                       key={p}
                       label={p}
@@ -383,14 +543,16 @@ export default function TechnicianOnboarding() {
                     />
                   ))}
                 </div>
+                {data.profession.length > 0 && (
+                  <p className="text-xs font-mono text-primary mt-2">
+                    {data.profession.length} selected — you'll pick services for each in the next step
+                  </p>
+                )}
               </FieldRow>
               <div className="grid grid-cols-2 gap-4">
                 <FieldRow label="Years of Experience">
                   <Input
-                    type="number"
-                    min="0"
-                    max="60"
-                    placeholder="e.g. 5"
+                    type="number" min="0" max="60" placeholder="e.g. 5"
                     value={data.yearsExperience}
                     onChange={e => set("yearsExperience", e.target.value)}
                     className="bg-background/50 font-mono"
@@ -432,12 +594,86 @@ export default function TechnicianOnboarding() {
             </div>
           )}
 
+          {/* Step 3: Services offered per profession */}
           {step === 2 && (
+            <div className="space-y-5">
+              <SectionHeading>Services Offered</SectionHeading>
+              {data.profession.length === 0 ? (
+                <div className="py-8 text-center border border-border/40 rounded-lg bg-muted/10">
+                  <p className="text-xs font-mono text-muted-foreground">
+                    No professions selected. Go back to Step 2 to pick your roles.
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-3 font-mono text-xs uppercase" onClick={() => setStep(1)}>
+                    ← Back to Expertise
+                  </Button>
+                </div>
+              ) : (
+                data.profession.map(prof => {
+                  const presets = PROFESSION_SERVICES[prof] ?? [];
+                  const selected = data.servicesOffered[prof] ?? [];
+                  return (
+                    <div key={prof} className="border border-border/50 rounded-lg p-4 space-y-3">
+                      <h4 className="font-mono text-sm font-bold text-primary uppercase">{prof}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {presets.map(svc => (
+                          <ToggleChip
+                            key={svc}
+                            label={svc}
+                            active={selected.includes(svc)}
+                            onClick={() => toggleService(prof, svc)}
+                          />
+                        ))}
+                      </div>
+                      {/* Custom services */}
+                      <div className="flex gap-2 mt-2">
+                        <Input
+                          placeholder="Add custom service..."
+                          value={data.customServices[prof] ?? ""}
+                          onChange={e =>
+                            setData(prev => ({
+                              ...prev,
+                              customServices: { ...prev.customServices, [prof]: e.target.value },
+                            }))
+                          }
+                          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCustomService(prof); } }}
+                          className="bg-background/50 font-mono text-xs h-8"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-3 font-mono text-xs shrink-0"
+                          onClick={() => addCustomService(prof)}
+                        >
+                          <PlusCircle className="w-3.5 h-3.5 mr-1" /> Add
+                        </Button>
+                      </div>
+                      {/* Show non-preset selected items (custom) */}
+                      {selected.filter(s => !presets.includes(s)).map(s => (
+                        <span key={s} className="inline-flex items-center gap-1 text-[10px] font-mono border border-primary/40 px-2 py-0.5 rounded text-primary bg-primary/10 mr-1.5 mb-1">
+                          {s}
+                          <button type="button" onClick={() => toggleService(prof, s)}>
+                            <X className="w-2.5 h-2.5" />
+                          </button>
+                        </span>
+                      ))}
+                      <p className="text-[10px] font-mono text-muted-foreground">
+                        {selected.length} service{selected.length !== 1 ? "s" : ""} selected
+                      </p>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* Step 4: Pricing */}
+          {step === 3 && (
             <div className="space-y-5">
               <SectionHeading>Pricing Structure</SectionHeading>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { key: "hourlyRate" as const,      label: "Hourly Rate ($)",        ph: "e.g. 75" },
+                  { key: "hourlyRate" as const,      label: "Hourly Rate ($)",         ph: "e.g. 75" },
                   { key: "perJobRate" as const,       label: "Per-Job Flat Rate ($)",   ph: "e.g. 120" },
                   { key: "visitCharge" as const,      label: "Visit / Call-out Fee ($)", ph: "e.g. 25" },
                   { key: "inspectionCharge" as const, label: "Inspection Fee ($)",      ph: "e.g. 40" },
@@ -447,9 +683,7 @@ export default function TechnicianOnboarding() {
                 ].map(({ key, label, ph }) => (
                   <FieldRow key={key} label={label}>
                     <Input
-                      type="number"
-                      min="0"
-                      placeholder={ph}
+                      type="number" min="0" placeholder={ph}
                       value={data[key]}
                       onChange={e => set(key, e.target.value)}
                       className="bg-background/50 font-mono"
@@ -459,14 +693,15 @@ export default function TechnicianOnboarding() {
               </div>
               <div className="border border-border/40 rounded p-3 bg-muted/10">
                 <p className="text-xs font-mono text-muted-foreground">
-                  All rates are in USD. Surcharges are added on top of your base rate. Customers see these before booking.
+                  All rates in USD. Surcharges stack on top of your base rate. Customers see these before booking.
                 </p>
               </div>
             </div>
           )}
 
-          {step === 3 && (
-            <div className="space-y-5">
+          {/* Step 5: Schedule */}
+          {step === 4 && (
+            <div className="space-y-4">
               <SectionHeading>Availability & Schedule</SectionHeading>
               <FieldRow label="Working Days">
                 <div className="flex gap-2 flex-wrap">
@@ -500,46 +735,33 @@ export default function TechnicianOnboarding() {
               </div>
               <FieldRow label="Max Daily Bookings">
                 <Input
-                  type="number"
-                  min="1"
-                  max="20"
+                  type="number" min="1" max="20"
                   value={data.maxDailyBookings}
                   onChange={e => set("maxDailyBookings", e.target.value)}
                   className="bg-background/50 font-mono max-w-xs"
                 />
               </FieldRow>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => set("emergencyAvailable", !data.emergencyAvailable)}
-                  className={`flex items-center gap-3 w-full border rounded-lg p-4 transition-colors ${
-                    data.emergencyAvailable
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-background/50 hover:border-primary/40"
-                  }`}
-                >
-                  <Zap className={`w-5 h-5 ${data.emergencyAvailable ? "text-primary" : "text-muted-foreground"}`} />
-                  <div className="text-left">
-                    <p className={`font-mono text-sm font-bold uppercase ${data.emergencyAvailable ? "text-primary" : ""}`}>
-                      Emergency / 24-7 Available
-                    </p>
-                    <p className="text-xs text-muted-foreground font-mono">
-                      Accept urgent calls outside working hours
-                    </p>
-                  </div>
-                  <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    data.emergencyAvailable ? "border-primary bg-primary" : "border-border"
-                  }`}>
-                    {data.emergencyAvailable && <CheckCircle className="w-3 h-3 text-black" />}
-                  </div>
-                </button>
-              </div>
+              <ToggleSwitch
+                checked={data.emergencyAvailable}
+                onChange={v => set("emergencyAvailable", v)}
+                label="Emergency / 24-7 Available"
+                description="Accept urgent calls outside working hours"
+                icon={<Zap className="w-5 h-5" />}
+              />
+              <ToggleSwitch
+                checked={data.vacationMode}
+                onChange={v => set("vacationMode", v)}
+                label="Vacation Mode"
+                description="Pause all incoming bookings temporarily"
+                icon={<span className="text-lg">🏖</span>}
+              />
             </div>
           )}
 
-          {step === 4 && (
+          {/* Step 6: Coverage + Profile Preview */}
+          {step === 5 && (
             <div className="space-y-5">
-              <SectionHeading>Service Coverage Area</SectionHeading>
+              <SectionHeading>Coverage Area & Profile Preview</SectionHeading>
               <div className="grid grid-cols-2 gap-4">
                 <FieldRow label="City / District">
                   <Input
@@ -561,9 +783,7 @@ export default function TechnicianOnboarding() {
               <FieldRow label="Service Radius (km)">
                 <div className="space-y-2">
                   <input
-                    type="range"
-                    min="1"
-                    max="100"
+                    type="range" min="1" max="100"
                     value={data.serviceRadius}
                     onChange={e => set("serviceRadius", e.target.value)}
                     className="w-full accent-primary"
@@ -575,145 +795,28 @@ export default function TechnicianOnboarding() {
                   </div>
                 </div>
               </FieldRow>
-              <div className="border border-border/40 rounded-lg p-4 bg-muted/10 space-y-2">
+
+              <div className="border-t border-border/40 pt-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <MapPin className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-mono uppercase text-primary">Coverage Summary</span>
-                </div>
-                <p className="text-sm font-mono">
-                  {data.serviceCity || "Your city"} ·{" "}
-                  <span className="text-primary">{data.serviceRadius} km radius</span>
-                </p>
-                {data.pinCode && (
-                  <p className="text-xs text-muted-foreground font-mono">PIN: {data.pinCode}</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {step === 5 && (
-            <div className="space-y-6">
-              <SectionHeading>Profile Preview</SectionHeading>
-              <div className="border border-primary/30 bg-primary/5 rounded-lg p-5 space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
-                    <span className="text-xl font-bold text-primary font-mono">
-                      {user?.name?.charAt(0) ?? "T"}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="font-bold text-lg uppercase">{user?.name}</h2>
-                    <p className="text-xs font-mono text-primary">
-                      {data.profession.join(" · ") || "TECHNICIAN"}
-                    </p>
-                    {data.serviceCity && (
-                      <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                        <MapPin className="w-3 h-3 inline mr-1" />{data.serviceCity} · {data.serviceRadius} km radius
-                      </p>
-                    )}
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-xl font-bold font-mono text-primary">
-                      ${data.hourlyRate || "—"}<span className="text-xs text-muted-foreground">/hr</span>
-                    </p>
-                    {data.emergencyAvailable && (
-                      <span className="text-[10px] font-mono bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 px-1.5 py-0.5 rounded">
-                        24/7
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {data.bio && (
-                  <p className="text-sm text-muted-foreground border-t border-border/40 pt-3">
-                    {data.bio}
-                  </p>
-                )}
-
-                <div className="grid grid-cols-2 gap-3 text-xs font-mono border-t border-border/40 pt-3">
-                  {data.yearsExperience && (
-                    <div>
-                      <span className="text-muted-foreground uppercase">Experience</span>
-                      <p className="font-bold text-sm mt-0.5">{data.yearsExperience} yrs</p>
-                    </div>
-                  )}
-                  {data.languagesSpoken.length > 0 && (
-                    <div>
-                      <span className="text-muted-foreground uppercase">Languages</span>
-                      <p className="font-bold text-sm mt-0.5">{data.languagesSpoken.join(", ")}</p>
-                    </div>
-                  )}
-                  {data.workingDays.length > 0 && (
-                    <div>
-                      <span className="text-muted-foreground uppercase">Working Days</span>
-                      <p className="font-bold text-sm mt-0.5">{data.workingDays.join(", ")}</p>
-                    </div>
-                  )}
-                  {data.workingHoursStart && data.workingHoursEnd && (
-                    <div>
-                      <span className="text-muted-foreground uppercase">Hours</span>
-                      <p className="font-bold text-sm mt-0.5">{data.workingHoursStart} – {data.workingHoursEnd}</p>
-                    </div>
-                  )}
-                  {data.maxDailyBookings && (
-                    <div>
-                      <span className="text-muted-foreground uppercase">Max Daily Jobs</span>
-                      <p className="font-bold text-sm mt-0.5">{data.maxDailyBookings}</p>
-                    </div>
-                  )}
-                  {data.visitCharge && (
-                    <div>
-                      <span className="text-muted-foreground uppercase">Visit Fee</span>
-                      <p className="font-bold text-sm mt-0.5">${data.visitCharge}</p>
-                    </div>
-                  )}
-                </div>
-
-                {(parseList(data.skills).length > 0 || parseList(data.certifications).length > 0) && (
-                  <div className="border-t border-border/40 pt-3 space-y-2">
-                    {parseList(data.skills).length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {parseList(data.skills).slice(0, 8).map(s => (
-                          <span key={s} className="text-[10px] font-mono border border-border px-2 py-0.5 rounded text-muted-foreground">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {parseList(data.certifications).length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {parseList(data.certifications).map(c => (
-                          <span key={c} className="text-[10px] font-mono border border-primary/40 px-2 py-0.5 rounded text-primary bg-primary/10">
-                            <Shield className="w-2.5 h-2.5 inline mr-0.5" />{c}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex items-center gap-3 border-t border-border/40 pt-3">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 text-yellow-400" />
-                    <span className="text-xs font-mono text-muted-foreground">New · 0 reviews</span>
-                  </div>
-                  <span className="w-1 h-1 rounded-full bg-border" />
-                  <span className="text-xs font-mono text-muted-foreground">
-                    {data.emergencyAvailable ? "24/7 Emergency" : "Scheduled only"}
+                  <Eye className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-mono uppercase text-primary tracking-widest">
+                    How Customers Will See You
                   </span>
                 </div>
+                <TechnicianProfileCard technician={buildPreviewTech()} />
               </div>
 
               <div className="border border-yellow-400/20 bg-yellow-400/5 rounded-lg p-3 flex items-start gap-2">
                 <CheckCircle className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
                 <p className="text-xs font-mono text-muted-foreground">
-                  Review your profile above. You can always update it later from <strong>Settings</strong>. Click <strong>LAUNCH PROFILE</strong> to go live.
+                  Review your profile above. You can always update it from <strong>Settings</strong>. Click <strong>LAUNCH PROFILE</strong> to go live.
                 </p>
               </div>
             </div>
           )}
         </div>
 
+        {/* Navigation */}
         <div className="mt-5 flex justify-between gap-4">
           <Button
             variant="outline"
@@ -724,7 +827,7 @@ export default function TechnicianOnboarding() {
             <ChevronLeft className="w-4 h-4 mr-1" /> Back
           </Button>
 
-          {step < 5 ? (
+          {!isLastStep ? (
             <Button className="uppercase font-bold font-mono px-8" onClick={() => setStep(s => s + 1)}>
               Next <ChevronRight className="w-4 h-4 ml-1" />
             </Button>

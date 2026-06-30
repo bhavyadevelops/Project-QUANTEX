@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Cpu, Wifi, Smartphone, Monitor, Home, Package, Wrench, Star, ChevronRight, Sparkles } from "lucide-react";
+import { TechnicianProfileCard } from "@/components/technician-profile-card";
 
 const CAT_ICONS: Record<string, React.ReactNode> = {
   "PC/Laptop Repair": <Cpu className="w-5 h-5" />,
@@ -347,13 +348,16 @@ export default function BookTechnician() {
             {step === "confirm" && (
               <div className="border border-border bg-card rounded-lg p-6 space-y-5">
                 <h2 className="font-bold uppercase font-mono text-sm text-primary">{t("book_confirm_title")}</h2>
-                <div className="space-y-3">
+
+                {selectedTech && (
+                  <TechnicianProfileCard technician={selectedTech as typeof selectedTech & { name: string }} compact />
+                )}
+
+                <div className="space-y-2">
                   {[
                     { label: t("book_confirm_service"),   value: selectedCat?.name },
-                    { label: t("book_confirm_tech"),      value: selectedTech?.name },
                     { label: t("book_confirm_address"),   value: form.getValues("address") },
                     { label: t("book_confirm_scheduled"), value: new Date(form.getValues("scheduledAt")).toLocaleString() },
-                    { label: t("book_confirm_cost"),      value: selectedTech?.hourlyRate ? `~$${selectedTech.hourlyRate}/hr` : "Quote on arrival" },
                   ].map((r) => (
                     <div key={r.label} className="flex items-center justify-between py-2 border-b border-border/50">
                       <span className="text-xs font-mono text-muted-foreground uppercase">{r.label}</span>
