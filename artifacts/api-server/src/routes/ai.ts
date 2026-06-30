@@ -25,7 +25,7 @@ router.post("/ai/analyze-issue", async (req, res): Promise<void> => {
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-5-mini",
       max_completion_tokens: 1024,
       messages: [
         {
@@ -102,7 +102,7 @@ router.post("/ai/technician-brief", async (req, res): Promise<void> => {
   try {
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-5-mini",
       max_completion_tokens: 800,
       messages: [
         {
