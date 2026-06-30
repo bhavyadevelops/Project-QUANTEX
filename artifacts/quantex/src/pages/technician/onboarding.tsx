@@ -28,57 +28,57 @@ import {
 } from "lucide-react";
 
 export const PROFESSIONS = [
-  "AC Technician",
-  "Refrigerator Repair",
-  "Washing Machine Repair",
-  "Microwave & Oven Repair",
-  "RO / Water Purifier Service",
-  "Laptop & PC Repair",
-  "Mobile Phone Repair",
-  "TV & Display Repair",
-  "CCTV & Security Systems",
-  "Networking & WiFi Setup",
-  "Smart Home Automation",
   "Electrician",
   "Plumber",
   "Carpenter",
+  "AC Technician",
+  "Appliance Repair",
+  "Computer Repair",
+  "Laptop Repair",
+  "Mobile Repair",
+  "CCTV Installation",
+  "RO Service",
   "Painter",
-  "Pest Control Specialist",
-  "Cleaning Specialist",
-  "Locksmith",
-  "HVAC / Ducting",
-  "Tiling & Flooring",
-  "Solar Panel Service",
-  "Generator & Inverter",
-  "Glass & Aluminium Work",
-  "Custom / Other",
+  "Welder",
+  "Mason",
+  "Interior Work",
+  "Furniture Assembly",
+  "Mechanic",
+  "Solar Technician",
+  "Internet & Networking",
+  "Smart Home Installation",
+  "Pest Control",
+  "Cleaning Services",
+  "Gardening",
+  "Home Automation",
+  "Custom/Other",
 ];
 
 export const PROFESSION_SERVICES: Record<string, string[]> = {
-  "AC Technician": ["AC Installation", "AC Gas Refilling", "AC Servicing & Cleaning", "AC Repair", "Thermostat Replacement", "Compressor Service", "Duct Cleaning"],
-  "Refrigerator Repair": ["Gas Refilling", "Compressor Replacement", "Cooling Coil Repair", "Thermostat Fix", "Door Seal Replacement", "PCB Repair", "Ice Maker Fix"],
-  "Washing Machine Repair": ["Not Spinning Fix", "Drain Issue", "PCB Repair", "Motor Replacement", "Drum Repair", "Water Inlet Fix", "Door Latch Repair"],
-  "Microwave & Oven Repair": ["Magnetron Replacement", "Turntable Fix", "Control Panel Repair", "Door Hinge Fix", "Heating Element", "Fan Motor Repair"],
-  "RO / Water Purifier Service": ["Filter Replacement", "Membrane Change", "Annual Servicing", "Installation", "TDS Check", "UV Lamp Replacement", "Pump Repair"],
-  "Laptop & PC Repair": ["Hardware Repair", "OS Installation", "Virus Removal", "Data Recovery", "Screen Replacement", "RAM/SSD Upgrade", "Battery Replacement"],
-  "Mobile Phone Repair": ["Screen Replacement", "Battery Replacement", "Charging Port Fix", "Speaker Repair", "Back Glass Replacement", "Software Flash", "Water Damage"],
-  "TV & Display Repair": ["Screen Repair", "Backlight Fix", "HDMI Port Repair", "Remote Programming", "Smart TV Setup", "Power Board Fix", "Speaker Repair"],
-  "CCTV & Security Systems": ["CCTV Installation", "DVR/NVR Setup", "Remote Viewing Config", "Camera Repair", "Access Control", "Alarm System", "Intercom Setup"],
-  "Networking & WiFi Setup": ["Router Config", "WiFi Extender Setup", "LAN Cabling", "Network Troubleshooting", "Firewall Config", "VPN Setup", "Home Office Network"],
-  "Smart Home Automation": ["Smart Hub Setup", "Voice Assistant Config", "Smart Lighting", "Smart Lock Install", "Home Theater Setup", "Automation Programming", "Smart AC Control"],
-  "Electrician": ["Wiring & Rewiring", "MCB/Fuse Box", "Outlet Installation", "Lighting Setup", "Fan Installation", "Earthing Check", "Short Circuit Fix"],
-  "Plumber": ["Pipe Repair", "Leak Detection", "Water Heater Install", "Drain Cleaning", "Tap/Faucet Fix", "Toilet Repair", "Geyser Installation"],
+  "Electrician": ["Wiring & Rewiring", "MCB/Fuse Box Repair", "Outlet Installation", "Lighting Setup", "Fan Installation", "Earthing Check", "Short Circuit Fix"],
+  "Plumber": ["Pipe Repair", "Leak Detection", "Geyser Installation", "Drain Cleaning", "Tap/Faucet Fix", "Toilet Repair", "Water Tank Cleaning"],
   "Carpenter": ["Furniture Repair", "Door/Window Fix", "Cabinet Making", "Shelving", "Wardrobe Fitting", "Wooden Flooring", "Furniture Assembly"],
+  "AC Technician": ["AC Installation", "AC Gas Refilling", "AC Servicing & Cleaning", "AC Repair", "Thermostat Replacement", "Compressor Service", "Duct Cleaning"],
+  "Appliance Repair": ["Refrigerator Repair", "Washing Machine Repair", "Microwave Repair", "Dishwasher Repair", "Dryer Repair", "Oven/Range Repair"],
+  "Computer Repair": ["Hardware Repair", "OS Installation", "Virus Removal", "Data Recovery", "RAM/SSD Upgrade", "Network Card Repair"],
+  "Laptop Repair": ["Screen Replacement", "Battery Replacement", "Keyboard Repair", "Charging Port Fix", "Hinge Repair", "Motherboard Repair"],
+  "Mobile Repair": ["Screen Replacement", "Battery Replacement", "Charging Port Fix", "Speaker Repair", "Back Glass Replacement", "Software Flash", "Water Damage Repair"],
+  "CCTV Installation": ["CCTV Camera Install", "DVR/NVR Setup", "Remote Viewing Config", "IP Camera Config", "Access Control", "Alarm System Setup", "Intercom Install"],
+  "RO Service": ["Filter Replacement", "Membrane Change", "Annual Servicing", "RO Installation", "TDS Calibration", "UV Lamp Replacement", "Pump Repair"],
   "Painter": ["Interior Painting", "Exterior Painting", "Texture Finish", "Wallpaper Install", "Waterproofing", "Wood Polish", "Epoxy Flooring"],
-  "Pest Control Specialist": ["General Pest Control", "Cockroach Treatment", "Ant Treatment", "Rodent Control", "Termite Treatment", "Bed Bug Treatment", "Mosquito Fogging"],
-  "Cleaning Specialist": ["Deep Cleaning", "Sofa & Carpet Cleaning", "Kitchen Deep Clean", "Bathroom Sanitisation", "Move-in/out Clean", "Post-construction Clean", "Water Tank Cleaning"],
-  "Locksmith": ["Lock Installation", "Lock Repair", "Key Duplication", "Emergency Lockout", "Digital Lock Setup", "Safe Opening", "Master Key Setup"],
-  "HVAC / Ducting": ["Duct Cleaning", "Duct Installation", "Ventilation Repair", "Exhaust Fan Install", "AHU Service", "Chiller Service", "Thermostat Calibration"],
-  "Tiling & Flooring": ["Floor Tiling", "Wall Tiling", "Tile Repair/Replacement", "Grout Cleaning", "Vinyl Flooring", "Marble Polishing", "Anti-slip Treatment"],
-  "Solar Panel Service": ["Solar Panel Install", "Inverter Setup", "Battery Storage", "System Audit", "Panel Cleaning", "Wiring & Connection", "Monitoring Setup"],
-  "Generator & Inverter": ["Installation", "Battery Replacement", "Wiring Fix", "Load Testing", "AMC Service", "Repair & Overhaul"],
-  "Glass & Aluminium Work": ["Window Fitting", "Glass Replacement", "Aluminium Partition", "Sliding Door Repair", "Shower Cubicle", "Glass Railing", "Mirror Fixing"],
-  "Custom / Other": ["On-site Diagnosis", "Consultation", "General Maintenance", "Custom Repair", "Emergency Visit"],
+  "Welder": ["MIG Welding", "TIG Welding", "Arc Welding", "Gate/Grill Fabrication", "Stainless Steel Work", "Aluminium Welding", "Repair Welding"],
+  "Mason": ["Brickwork", "Plastering", "Waterproofing", "Tile Fixing", "Concrete Work", "Foundation Repair", "Wall Repair"],
+  "Interior Work": ["False Ceiling", "Wall Panelling", "POP Work", "Gypsum Board", "Partition Work", "Glass Partition", "Modular Furniture Fitting"],
+  "Furniture Assembly": ["Wardrobe Assembly", "Bed Assembly", "Dining Table Setup", "Office Chair Assembly", "Shelf Assembly", "TV Unit Assembly"],
+  "Mechanic": ["Vehicle Servicing", "Oil Change", "Brake Repair", "Tyre Change", "Battery Replacement", "Engine Tune-up", "AC Recharge"],
+  "Solar Technician": ["Solar Panel Install", "Inverter Setup", "Battery Bank Setup", "System Audit", "Panel Cleaning", "Net Metering", "Monitoring Setup"],
+  "Internet & Networking": ["Router Config", "WiFi Extender Setup", "LAN Cabling", "Network Troubleshooting", "VPN Setup", "Firewall Config", "Home Office Network"],
+  "Smart Home Installation": ["Smart Hub Setup", "Voice Assistant Config", "Smart Lighting", "Smart Lock Install", "Home Theater Setup", "Smart Doorbell", "Automation Scenes"],
+  "Pest Control": ["General Pest Treatment", "Cockroach Treatment", "Ant Treatment", "Rodent Control", "Termite Treatment", "Bed Bug Treatment", "Mosquito Fogging"],
+  "Cleaning Services": ["Deep Cleaning", "Sofa & Carpet Cleaning", "Kitchen Deep Clean", "Bathroom Sanitisation", "Move-in/out Clean", "Post-construction Clean", "Water Tank Cleaning"],
+  "Gardening": ["Lawn Mowing", "Hedge Trimming", "Plant Care", "Garden Design", "Soil Treatment", "Irrigation Setup", "Tree Trimming"],
+  "Home Automation": ["Automation Programming", "Scene Setup", "Sensor Installation", "Smart Thermostat", "HVAC Automation", "Energy Monitoring", "Custom Automation"],
+  "Custom/Other": ["On-site Diagnosis", "Consultation", "General Maintenance", "Custom Repair", "Emergency Visit"],
 };
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -243,11 +243,19 @@ export default function TechnicianOnboarding() {
   const [technicianId, setTechnicianId] = useState<number | null>(null);
   const [initializing, setInitializing] = useState(true);
 
-  const { data: existingProfile } = useGetMyTechnicianProfile({ query: { retry: false } as any });
+  const {
+    data: existingProfile,
+    isLoading: profileLoading,
+    isError: profileNotFound,
+  } = useGetMyTechnicianProfile({ query: { retry: false } as any });
   const createProfile = useCreateTechnicianProfile();
   const updateProfile = useUpdateTechnician();
 
+  // Single effect: wait for query to settle before deciding to populate or create.
+  // This prevents the duplicate-profile race where a create fires while the GET is still in flight.
   useEffect(() => {
+    if (profileLoading) return; // wait — query not yet resolved
+
     if (existingProfile) {
       setTechnicianId(existingProfile.id);
       const raw = existingProfile.servicesOffered as ServicesOffered | null;
@@ -282,25 +290,21 @@ export default function TechnicianOnboarding() {
         maxDailyBookings: existingProfile.maxDailyBookings?.toString() ?? "5",
       }));
       setInitializing(false);
+      return;
     }
-  }, [existingProfile]);
 
-  useEffect(() => {
-    if (!existingProfile && !createProfile.isPending && initializing) {
-      const timer = setTimeout(async () => {
-        try {
-          const profile = await createProfile.mutateAsync({
-            data: { skills: [], hourlyRate: 0, responseTime: "30 min" },
-          });
-          setTechnicianId(profile.id);
-        } catch {
-        }
-        setInitializing(false);
-      }, 1200);
-      return () => clearTimeout(timer);
+    // Query settled with no profile (404/error) — create one now.
+    // The unique constraint on user_id guarantees no duplicates even if called twice.
+    if (profileNotFound && !createProfile.isPending && initializing) {
+      createProfile.mutateAsync({
+        data: { skills: [], hourlyRate: 0, responseTime: "30 min" },
+      }).then(profile => {
+        setTechnicianId(profile.id);
+      }).catch(() => {
+        // Profile may already exist (race) — it will be returned from /me on next render
+      }).finally(() => setInitializing(false));
     }
-    return undefined;
-  }, [existingProfile, initializing]);
+  }, [profileLoading, existingProfile, profileNotFound]);
 
   const set = <K extends keyof WizardData>(key: K, value: WizardData[K]) =>
     setData(prev => ({ ...prev, [key]: value }));

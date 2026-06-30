@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, real, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, real, timestamp, jsonb, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { usersTable } from "./users";
@@ -42,12 +42,14 @@ export const techniciansTable = pgTable("technicians", {
   // Location
   serviceCity: text("service_city"),
   pinCode: text("pin_code"),
-  // Personal
+  // Personal (owner-only fields — never exposed on public list/detail endpoints)
   gender: text("gender"),
   dateOfBirth: text("date_of_birth"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-});
+}, (t) => [
+  unique("technicians_user_id_unique").on(t.userId),
+]);
 
 export const insertTechnicianSchema = createInsertSchema(techniciansTable).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertTechnician = z.infer<typeof insertTechnicianSchema>;

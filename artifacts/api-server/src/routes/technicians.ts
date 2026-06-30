@@ -12,7 +12,11 @@ import { getAuthUser } from "./auth";
 
 const router: IRouter = Router();
 
-function technicianRow(t: typeof techniciansTable.$inferSelect) {
+/**
+ * Fields safe to expose on public list/detail endpoints.
+ * Never includes: dateOfBirth, gender, pinCode (personally-sensitive owner-only data).
+ */
+function publicTechRow(t: typeof techniciansTable.$inferSelect) {
   return {
     id: t.id,
     userId: t.userId,
@@ -47,6 +51,16 @@ function technicianRow(t: typeof techniciansTable.$inferSelect) {
     maxDailyBookings: t.maxDailyBookings,
     serviceRadius: t.serviceRadius,
     serviceCity: t.serviceCity,
+  };
+}
+
+/**
+ * Full row including personally-sensitive fields.
+ * Only used on /technicians/me (owner-scoped endpoint).
+ */
+function privateTechRow(t: typeof techniciansTable.$inferSelect) {
+  return {
+    ...publicTechRow(t),
     pinCode: t.pinCode,
     gender: t.gender,
     dateOfBirth: t.dateOfBirth,
@@ -72,13 +86,11 @@ router.get("/technicians", async (req, res): Promise<void> => {
     .where(conditions.length > 0 ? and(...conditions) : undefined)
     .limit(query.data.limit ?? 20);
 
-  const result = rows.map(({ technicians: t, users: u }) => ({
-    ...technicianRow(t),
+  res.json(rows.map(({ technicians: t, users: u }) => ({
+    ...publicTechRow(t),
     name: u.name,
     distance: Math.round(Math.random() * 10 * 10) / 10,
-  }));
-
-  res.json(result);
+  })));
 });
 
 router.get("/technicians/me", async (req, res): Promise<void> => {
@@ -99,7 +111,7 @@ router.get("/technicians/me", async (req, res): Promise<void> => {
     return;
   }
 
-  res.json({ ...technicianRow(row), name: user.name, distance: null });
+  res.json({ ...privateTechRow(row), name: user.name, distance: null });
 });
 
 router.post("/technicians", async (req, res): Promise<void> => {
@@ -113,6 +125,17 @@ router.post("/technicians", async (req, res): Promise<void> => {
   const body = CreateTechnicianProfileBody.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  // Return existing profile if one already exists (idempotent create)
+  const [existing] = await db
+    .select()
+    .from(techniciansTable)
+    .where(eq(techniciansTable.userId, user.id));
+
+  if (existing) {
+    res.status(201).json({ ...privateTechRow(existing), name: user.name, distance: null });
     return;
   }
 
@@ -150,11 +173,7 @@ router.post("/technicians", async (req, res): Promise<void> => {
     dateOfBirth: d.dateOfBirth ?? null,
   }).returning();
 
-  res.status(201).json({
-    ...technicianRow(technician),
-    name: user.name,
-    distance: null,
-  });
+  res.status(201).json({ ...privateTechRow(technician), name: user.name, distance: null });
 });
 
 router.get("/technicians/:id", async (req, res): Promise<void> => {
@@ -175,7 +194,7 @@ router.get("/technicians/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  res.json({ ...technicianRow(row.technicians), name: row.users.name, distance: null });
+  res.json({ ...publicTechRow(row.technicians), name: row.users.name, distance: null });
 });
 
 router.patch("/technicians/:id", async (req, res): Promise<void> => {
@@ -192,7 +211,7 @@ router.patch("/technicians/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  // Verify ownership: the authenticated user must own this technician profile
+  // Ownership check: only the owning technician may update their profile
   const [existing] = await db
     .select({ userId: techniciansTable.userId })
     .from(techniciansTable)
@@ -225,7 +244,8 @@ router.patch("/technicians/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  res.json({ ...technicianRow(technician), name: user.name, distance: null });
+  // Owner-scoped response includes sensitive personal fields
+  res.json({ ...privateTechRow(technician), name: user.name, distance: null });
 });
 
 router.get("/technicians/:id/reviews", async (req, res): Promise<void> => {
