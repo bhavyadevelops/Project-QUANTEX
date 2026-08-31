@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "QUANTEX"
+version = "1.0.0"
+id = "artifacts/quantex"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25740
+
+[services.development]
+run = "pnpm --filter @workspace/quantex run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/quantex", "run", "build" ]
+publicDir = "artifacts/quantex/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25740"
+BASE_PATH = "/"
