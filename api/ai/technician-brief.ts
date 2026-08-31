@@ -75,8 +75,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(502).json({ error: "AI service temporarily unavailable" });
     }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content ?? "{}";
+    const data: any = await response.json();
+    const content: string = data.choices?.[0]?.message?.content ?? "{}";
 
     let result;
     try {
