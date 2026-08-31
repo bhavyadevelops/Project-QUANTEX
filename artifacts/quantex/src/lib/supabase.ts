@@ -2,13 +2,24 @@
 import { configureSupabase, getSupabase } from "@workspace/api-client-react";
 
 // Auto-configure on import using Vite env vars
-const url = import.meta.env.VITE_SUPABASE_URL as string;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const url = (import.meta.env.VITE_SUPABASE_URL ?? "") as string;
+const anonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? "") as string;
 
-if (!url || !anonKey) {
-  console.error("Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY");
+const trimmedUrl = url.trim();
+const trimmedKey = anonKey.trim();
+
+if (!trimmedUrl || !trimmedKey) {
+  console.error(
+    "[QUANTEX] Missing Supabase env vars. " +
+    "Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your Vercel project settings."
+  );
+} else if (!trimmedUrl.startsWith("https://")) {
+  console.error(
+    "[QUANTEX] VITE_SUPABASE_URL must start with https://. Got:",
+    trimmedUrl.slice(0, 30) + "..."
+  );
 } else {
-  configureSupabase(url, anonKey);
+  configureSupabase(trimmedUrl, trimmedKey);
 }
 
 export const supabase = getSupabase();
