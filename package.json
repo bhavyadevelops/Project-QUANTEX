@@ -13,6 +13,7 @@
     "@types/node": "catalog:",
     "@vercel/node": "^9.0.1",
     "prettier": "^3.8.3",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "undici-types": "7.19.2"
   }
 }

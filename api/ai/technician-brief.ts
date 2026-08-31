@@ -1,5 +1,5 @@
-/// <reference types="node" />
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { Response as FetchResponse } from "undici-types";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
@@ -56,7 +56,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   ];
 
   try {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const response: FetchResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

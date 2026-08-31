@@ -169,6 +169,9 @@ importers:
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
+      undici-types:
+        specifier: 7.19.2
+        version: 7.19.2
 
   artifacts/api-server:
     dependencies:
