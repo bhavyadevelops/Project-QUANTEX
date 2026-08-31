@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
